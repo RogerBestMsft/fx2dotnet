@@ -1,9 +1,10 @@
 ---
 name: AppMod Modernization Orchestrator
-description: "Orchestrates end-to-end modernization flow: validate analysis.md prerequisite, process projects in topological order for SDK-style conversion (excluding web apps), then run package compatibility migration, project-by-project multitarget migration in topological order, and ASP.NET Framework to ASP.NET Core web migration."
+description: "Orchestrates end-to-end modernization flow: validate analysis.md prerequisite, process projects in topological order for SDK-style conversion (excluding web apps), then run package compatibility migration, project-by-project multitarget migration in topological order,
+ and ASP.NET Framework to ASP.NET Core web migration."
 argument-hint: "Specify the .sln/.slnx path, optional analysis.md path, optional target framework (default: net10.0), and optional legacy web host project path"
 target: vscode
-tools: ['search', 'read', 'edit', 'execute', 'todo', 'vscode/memory', 'vscode/askQuestions', 'agent']
+tools: [vscode/askQuestions, vscode/memory, execute, read, agent, microsoft.githubcopilot.appmodernization.mcp/get_projects_in_topological_order, edit, search, todo]
 agents: ['SDK-Style Project Conversion', 'Package Compatibility Core Migration', 'Multitarget Migration', 'ASP.NET Framework to ASP.NET Core Web Migration', 'Explore']
 handoffs:
   - label: Commit Changes
@@ -18,7 +19,7 @@ You are an ORCHESTRATION AGENT for .NET modernization. You enforce stage order a
 <rules>
 - Enforce phase order strictly; do not skip or reorder phases
 - Do not start modernization unless analysis.md prerequisite is satisfied
-- Use mcp_microsoft_git_get_projects_in_topological_order to determine project processing order
+- Use get_projects_in_topological_order to determine project processing order
 - Process projects in topological order only
 - Do not run SDK-style conversion for web application host projects
 - Do not treat library projects as web hosts only because they reference `System.Web`, `Microsoft.AspNet.WebApi`, or related legacy packages
@@ -77,7 +78,7 @@ Record prerequisiteStatus: "satisfied"
 
 ## 3. Get Topological Project Order
 
-Call mcp_microsoft_git_get_projects_in_topological_order with:
+Call get_projects_in_topological_order with:
 - solutionPath: absolute path to selected .sln or .slnx
 
 Persist returned order into topologicalProjects.
