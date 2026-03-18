@@ -1,10 +1,76 @@
+#:package GitVersion.MsBuild@6.4.0
+#:package Microsoft.Extensions.Hosting@10.0.4
+#:package ModelContextProtocol@1.1.0
+#:package NuGet.Frameworks@6.14.0
+#:package NuGet.Protocol@6.14.0
+
+using System.ComponentModel;
+using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using ModelContextProtocol.Server;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 
-namespace fx2dotnet;
+var builder = Host.CreateApplicationBuilder(args);
+
+// Keep stdout clean for MCP stdio JSON-RPC traffic.
+builder.Logging.ClearProviders();
+
+builder.Services
+	.AddMcpServer()
+	.WithStdioServerTransport()
+	.WithToolsFromAssembly();
+
+using var host = builder.Build();
+await host.RunAsync();
+
+// ============================================================================
+// MCP Server Tool Definitions
+// ============================================================================
+
+[McpServerToolType]
+internal static class Tools
+{
+    [McpServerTool]
+    [Description("Takes a list of NuGet packages with current versions and returns the subset recommended for upgrade to meet minimum .NET Core/.NET or .NET Standard support.")]
+    public static async Task<string> FindRecommendedPackageUpgrades(
+        [Description("Optional workspace root directory used for default NuGet configuration resolution when nugetConfigPath is not provided.")]
+        string? workspaceDirectory,
+        [Description("Optional full path to a specific nuget.config file. If null or empty, default NuGet config resolution is used from workspaceDirectory.")]
+        string? nugetConfigPath,
+        [Description("Packages to evaluate. Each item should include packageId and currentVersion.")]
+        IReadOnlyList<PackageVersionInput> packages,
+        [Description("When true, prerelease versions are included while searching for the minimum supported version.")]
+        bool includePrerelease = false)
+    {
+        if (packages is null || packages.Count == 0)
+        {
+            return JsonSerializer.Serialize(new PackageUpgradeRecommendationResult(
+                Array.Empty<PackageUpgradeRecommendation>(),
+                "packages is required and must contain at least one item."));
+        }
+
+        if (packages.Any(p => string.IsNullOrWhiteSpace(p.PackageId)))
+        {
+            return JsonSerializer.Serialize(new PackageUpgradeRecommendationResult(
+                Array.Empty<PackageUpgradeRecommendation>(),
+                "Each package item must include a non-empty packageId."));
+        }
+
+        var result = await NuGetPackageSupportService.FindRecommendedUpgradesAsync(
+            workspaceDirectory,
+            nugetConfigPath,
+            packages,
+            includePrerelease);
+
+        return JsonSerializer.Serialize(result);
+    }
+}
 
 internal static class NuGetPackageSupportService
 {

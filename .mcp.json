@@ -14,6 +14,15 @@
         "convert_project_to_sdk_style",
         "get_projects_in_topological_order"
       ]
+    },
+    "NuGetVersions":{
+      "type": "stdio",
+      "command": "dnx",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/servers/nugetversions/app.cs"],
+      "tools":
+      [
+        "*"
+      ]
     }
-  }
+  }  
 }
