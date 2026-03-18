@@ -16,7 +16,7 @@
     },
     "NuGetVersions": {
       "type": "stdio",
-      "command": "dnx",
+      "command": "dotnet",
       "args": [
         "run",
         "${CLAUDE_PLUGIN_ROOT}/servers/nugetversions/app.cs",
