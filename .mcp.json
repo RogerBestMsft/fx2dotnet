@@ -18,7 +18,7 @@
     "NuGetVersions":{
       "type": "stdio",
       "command": "dnx",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/servers/nugetversions/app.cs"],
+      "args": ["run", "${CLAUDE_PLUGIN_ROOT}/servers/nugetversions/app.cs"],
       "tools":
       [
         "*"
