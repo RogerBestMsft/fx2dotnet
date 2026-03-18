@@ -3,7 +3,7 @@ name: Package Compatibility Core Migration
 description: "Use when auditing and minimally updating NuGet packages in a full .NET solution for .NET Core compatibility. Grounds decisions in NuGet framework support, applies smallest safe updates in ordered chunks, and invokes Build Fix after each chunk."
 argument-hint: "Specify the .sln path and target framework (for example: net10.0)."
 target: vscode
-tools: ['search', 'read', 'edit', 'execute', 'todo', 'vscode/memory', 'vscode/askQuestions', 'agent', 'Swick.Mcp.NuGetVersions/FindRecommendedPackageUpgrades']
+tools: ['search', 'read', 'edit', 'execute', 'todo', 'vscode/memory', 'vscode/askQuestions', 'agent', 'swick.mcp.nugetversions/*']
 agents: ['Build Fix', 'Plan']
 user-invocable: false
 handoffs:
