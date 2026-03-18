@@ -14,7 +14,7 @@
         "get_projects_in_topological_order"
       ]
     },
-    "NuGetVersions": {
+    "Swick.Mcp.NuGetVersions": {
       "type": "stdio",
       "command": "dnx",
       "args": [
