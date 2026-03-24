@@ -71,24 +71,9 @@ From the classified projects, identify which project(s) are web-app-hosts:
 - If multiple web-app-hosts, list all and flag that user must choose or confirm order
 - If no web-app-hosts detected, note that the ASP.NET Core migration phase may be skippable
 
-### 4. Create Chunked Package Update Plan
+### 4. Resolve Unsupported and Out-of-Scope Packages
 
-The ONLY goal of package updates in this phase is to reach versions that support .NET Core / .NET Standard / modern .NET. Do NOT include updates motivated purely by security advisories, bug fixes, or staying on the latest version — those are out of scope for the migration and can be addressed separately afterward.
-
-Using the compatibility cards from the assessment, build an ordered update plan:
-
-1. Exclude packages whose current version already supports the target (marked `Supports Target: yes`)
-2. From the remaining packages, classify each update by risk:
-   - Minor updates: the minimum compatible version is a patch or minor bump from the current version
-   - Major updates: the minimum compatible version is a major version jump or has known API surface risk
-3. Order minor updates before major updates
-4. Within each risk level, order by dependency depth (leaf packages first)
-5. Each package appears exactly once
-6. Flag packages with `Legacy Content: yes` or `Install Script: yes` with manual review notes
-
-Produce numbered chunks, each containing a set of packages that can be updated and validated together.
-
-### 5. Resolve Unsupported and Out-of-Scope Packages
+This step establishes **every change** that is required because a package or library is out of support on the target framework. All such changes must be identified and decided here — later steps must not introduce additional package changes beyond what is established in this step and step 5.
 
 For every unsupported library and out-of-scope item identified in the assessment, you MUST recommend a concrete resolution. Do NOT leave these as passive lists — each item needs a decision.
 
@@ -106,6 +91,26 @@ For every unsupported library and out-of-scope item identified in the assessment
 1. Confirm why it is out of scope (per skill policies or assessment rationale)
 2. Recommend a concrete post-migration action with enough detail to be actionable (not just "migrate later")
 3. Note any pre-migration prep that should happen during the current migration (e.g., adding an abstraction layer, extracting an interface)
+
+### 5. Create Chunked Package Update Plan
+
+The ONLY goal of package updates is to reach versions that support .NET Core / .NET Standard / modern .NET. Do NOT include updates motivated purely by security advisories, bug fixes, or staying on the latest version — those are out of scope for the migration and can be addressed separately afterward. If a package already supports the target, it MUST NOT be updated.
+
+This step covers only packages that have a compatible version available. Packages resolved as unsupported in step 4 (replace, remove-rewrite, wrap-isolate, drop, or block) are NOT included here — their resolutions are already established.
+
+Using the compatibility cards from the assessment, build an ordered update plan:
+
+1. Exclude packages whose current version already supports the target (marked `Supports Target: yes`)
+2. Exclude packages already resolved as unsupported in step 4
+3. From the remaining packages, classify each update by risk:
+   - Minor updates: the minimum compatible version is a patch or minor bump from the current version
+   - Major updates: the minimum compatible version is a major version jump or has known API surface risk
+4. Order minor updates before major updates
+5. Within each risk level, order by dependency depth (leaf packages first)
+6. Each package appears exactly once
+7. Flag packages with `Legacy Content: yes` or `Install Script: yes` with manual review notes
+
+Produce numbered chunks, each containing a set of packages that can be updated and validated together.
 
 ### 6. Produce the Migration Plan
 
@@ -138,19 +143,9 @@ Projects skipped:
 
 ## Phase 2: Package Compatibility
 
-Packages already compatible (no update needed): {list}
-Packages requiring update: {list}
-
-### Chunked Update Plan
-Chunk 1: {package list with current → min compatible versions}
-Chunk 2: ...
-
-### Legacy Packaging Warnings
-Packages with `content/` folder or `install.ps1` requiring manual review:
-| Package | Current | Min Compatible | Legacy Content | Install Script |
-
 ### Unsupported Libraries — Decisions
 Every unsupported package MUST have a resolution. Do not leave any as "TBD" or unresolved.
+All changes due to out-of-support packages are established here — no additional package changes beyond these resolutions and the chunked update plan below.
 | Package | Current | Projects | Usage Scope | Resolution | Detail |
 
 Resolution values: `replace`, `remove-rewrite`, `wrap-isolate`, `drop`, `block`
@@ -167,6 +162,18 @@ Every out-of-scope item MUST have both a rationale and a concrete post-migration
 - **Rationale**: Why this is deferred (policy, complexity, separate workstream)
 - **Pre-Migration Prep**: Any prep work to do NOW during migration (e.g., extract interface, add abstraction layer). Use "none" if nothing is needed.
 - **Post-Migration Action**: Specific next step after migration completes (e.g., "Migrate from EF6 to EF Core 10 — see ef6-migration-policy skill")
+
+### Chunked Update Plan
+
+Packages already compatible (no update needed): {list}
+Packages requiring update (only those that need a newer version for target framework support): {list}
+
+Chunk 1: {package list with current → min compatible versions}
+Chunk 2: ...
+
+### Legacy Packaging Warnings
+Packages with `content/` folder or `install.ps1` requiring manual review:
+| Package | Current | Min Compatible | Legacy Content | Install Script |
 
 ## Phase 3: Multitarget Migration
 - Projects to multitarget (in topological order): {list}
