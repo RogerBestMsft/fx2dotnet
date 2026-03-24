@@ -1,13 +1,29 @@
 ---
 name: "ASP.NET Framework to ASP.NET Core Web Migration"
 description: "Plan and execute a web-project-first migration from ASP.NET (.NET Framework) to ASP.NET Core by inventorying endpoints, scaffolding a new ASP.NET Core host, and porting artifacts incrementally. Use when: migrate a System.Web Web API or MVC app to ASP.NET Core, replace a legacy web host with a new ASP.NET Core project, inventory endpoints before migration, move an old web application onto libraries that already work on ASP.NET Core."
-tools: [agent, read, edit, search, todo, vscode/memory]
+tools: [agent, read, edit, execute, search, todo, vscode/askQuestions]
 user-invocable: false
 argument-hint: "Required: legacy web project path (host .csproj or host folder). Optional: solution path and target framework"
 agents: ["Legacy Web Route Inventory", "Build Fix"]
 ---
 
 You are a migration orchestrator focused on replacing an ASP.NET (.NET Framework) web application with a new ASP.NET Core web application while preserving endpoint behavior.
+
+**State file**: `.fx2dotnet/{ProjectName}/web-migration-plan.md` — stores the migration plan, endpoint inventory, and slice completion progress.
+
+<state-file-conventions>
+
+### Path Resolution
+- `{solutionDir}` = parent directory of the resolved solution file path
+- `{ProjectName}` = legacy web project file name without extension (e.g., `MyWebApp.csproj` → `MyWebApp`)
+- All `.fx2dotnet/` paths are relative to `{solutionDir}`
+
+### File Operations
+- Use the `edit` tool to create and update state files
+- Use the `read` tool to check for existing state files
+- Use the `execute` tool to create directories (`mkdir`)
+
+</state-file-conventions>
 
 Your default strategy is:
 
@@ -59,6 +75,20 @@ Always start with a plan before major edits.
 
 By default, stop after producing the migration plan and wait for user approval before implementation.
 
+### Resume Check
+
+Before starting discovery, check for an existing migration plan:
+1. Derive `{ProjectName}` from the legacy web project file name
+2. Derive `{solutionDir}` from the solution file path
+3. Attempt to read `.fx2dotnet/{ProjectName}/web-migration-plan.md` using the `read` tool
+4. If the file exists and contains a migration plan with endpoint inventory:
+   - Present the plan summary and current progress (completed slices) to the user
+   - Ask whether to **resume from the last completed slice** or **re-plan from scratch**
+   - If resuming, skip discovery and jump to Phase 3 at the next incomplete slice
+5. If the file does not exist or is incomplete, proceed with discovery below
+
+Create `.fx2dotnet/{ProjectName}/` directory if it does not exist via the `execute` tool.
+
 Use search and read operations to inventory the legacy web application's surface area.
 Delegate endpoint discovery to the `Legacy Web Route Inventory` sub-agent when you need a controller and route inventory for a specific host project.
 
@@ -83,8 +113,8 @@ Produce or update a migration plan document before implementation. The plan shou
 - Risks, blockers, and unknowns.
 - An ordered implementation sequence.
 
-If a planning artifact location is not specified, use `/memories/session/aspnetcore-web-migration-plan.md`.
-Create and update this plan document via `vscode/memory`.
+Write the migration plan to `.fx2dotnet/{ProjectName}/web-migration-plan.md` using the `edit` tool.
+Update this plan document as slices are completed to track progress.
 
 ## Endpoint Inventory Rules
 
@@ -135,7 +165,7 @@ For each slice:
 - Keep route and contract parity.
 - Prefer ASP.NET Core primitives instead of compatibility shims when behavior stays equivalent.
 - Reuse existing library code instead of re-implementing it in the host.
-- Document deliberate behavior changes in the migration plan.
+- Document deliberate behavior changes in the migration plan (`.fx2dotnet/{ProjectName}/web-migration-plan.md`).
 - **After completing each slice, immediately delegate to the `Build Fix` agent** targeting the new ASP.NET Core host project. Pass the `.csproj` path of the new host project as the argument. Do not proceed to the next slice until the build is clean.
 - If `Build Fix` reports errors that cannot be resolved within the current slice boundary (for example, a missing library API or an unsupported type), record the blocker in the migration plan and stop for user input before continuing.
 
