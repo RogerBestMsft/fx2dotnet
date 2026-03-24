@@ -228,7 +228,7 @@ Phases 3 and 5 (SDK conversion and multitargeting) process projects in **breadth
 
 ```mermaid
 flowchart BT
-    WebApp([WebApp\n‹MVC App›])
+    WebApp([WebApp])
     Services([Services])
     Data([Data])
     Auth([Auth])
@@ -247,18 +247,14 @@ flowchart BT
 
 ```mermaid
 flowchart LR
-    step1["① Common"]:::leaf
-    step2["② Logging"]:::leaf
-    step3["③ Data"]:::mid
-    step4["④ Auth"]:::mid
-    step5["⑤ Services"]:::mid
-    step6["⑥ WebApp"]:::root
+    step1["① Common"]
+    step2["② Logging"]
+    step3["③ Data"]
+    step4["④ Auth"]
+    step5["⑤ Services"]
+    step6["⑥ WebApp"]
 
     step1 --> step2 --> step3 --> step4 --> step5 --> step6
-
-    classDef leaf fill:#90EE90,stroke:#333,color:#000
-    classDef mid fill:#FFD700,stroke:#333,color:#000
-    classDef root fill:#87CEEB,stroke:#333,color:#000
 ```
 
 ## Architecture
