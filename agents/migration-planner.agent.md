@@ -88,7 +88,26 @@ Using the compatibility cards from the assessment, build an ordered update plan:
 
 Produce numbered chunks, each containing a set of packages that can be updated and validated together.
 
-### 5. Produce the Migration Plan
+### 5. Resolve Unsupported and Out-of-Scope Packages
+
+For every unsupported library and out-of-scope item identified in the assessment, you MUST recommend a concrete resolution. Do NOT leave these as passive lists — each item needs a decision.
+
+**For each unsupported library** (no compatible version exists for the target framework):
+1. Use the **Explore** subagent to search the codebase for how the package is used (which projects, which APIs, how deeply integrated)
+2. Recommend exactly one resolution per package:
+   - **Replace** — a compatible alternative package exists that covers the needed functionality. Name the replacement and note any API differences.
+   - **Remove & rewrite** — the package usage is limited enough that the functionality can be reimplemented inline or with built-in .NET APIs. Describe what needs rewriting.
+   - **Wrap & isolate** — the package is deeply integrated. Recommend isolating it behind an interface/abstraction so it can be swapped later, and keep it via a compatibility shim or `#if` conditional compilation during multitargeting.
+   - **Drop** — the functionality provided by the package is no longer needed. Justify why.
+   - **Block** — no viable path forward without user input. Clearly state what decision is needed from the user.
+3. Estimate the impact: how many files/call sites are affected
+
+**For each out-of-scope item** (e.g., EF6, proprietary SDKs, platform-specific libraries):
+1. Confirm why it is out of scope (per skill policies or assessment rationale)
+2. Recommend a concrete post-migration action with enough detail to be actionable (not just "migrate later")
+3. Note any pre-migration prep that should happen during the current migration (e.g., adding an abstraction layer, extracting an interface)
+
+### 6. Produce the Migration Plan
 
 Generate a structured plan with these sections:
 
@@ -130,11 +149,24 @@ Chunk 2: ...
 Packages with `content/` folder or `install.ps1` requiring manual review:
 | Package | Current | Min Compatible | Legacy Content | Install Script |
 
-### Unsupported Libraries
-| Package | Current | Projects | Notes |
+### Unsupported Libraries — Decisions
+Every unsupported package MUST have a resolution. Do not leave any as "TBD" or unresolved.
+| Package | Current | Projects | Usage Scope | Resolution | Detail |
 
-### Out-of-Scope Items
-| Item | Why Out of Scope | Post-Migration Action |
+Resolution values: `replace`, `remove-rewrite`, `wrap-isolate`, `drop`, `block`
+- **replace**: Name the alternative package and version
+- **remove-rewrite**: Describe what needs reimplementing and estimated scope
+- **wrap-isolate**: Describe the abstraction boundary to introduce
+- **drop**: Justify why the functionality is no longer needed
+- **block**: State exactly what user decision is required — this blocks the migration
+
+### Out-of-Scope Items — Decisions
+Every out-of-scope item MUST have both a rationale and a concrete post-migration action plan.
+| Item | Rationale | Pre-Migration Prep | Post-Migration Action |
+
+- **Rationale**: Why this is deferred (policy, complexity, separate workstream)
+- **Pre-Migration Prep**: Any prep work to do NOW during migration (e.g., extract interface, add abstraction layer). Use "none" if nothing is needed.
+- **Post-Migration Action**: Specific next step after migration completes (e.g., "Migrate from EF6 to EF Core 10 — see ef6-migration-policy skill")
 
 ## Phase 3: Multitarget Migration
 - Projects to multitarget (in topological order): {list}
