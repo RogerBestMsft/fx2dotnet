@@ -5,7 +5,7 @@ argument-hint: Specify the .sln, .csproj, .vbproj, or .fsproj file to build
 target: vscode
 user-invocable: false
 tools: ['search', 'read', 'edit', 'todo', 'vscode/askQuestions', 'agent']
-agents: ['Explore']
+agents: ['Explore', 'agent']
 handoffs:
   - label: Commit Changes
     agent: agent
@@ -38,6 +38,7 @@ You are a BUILD/FIX AGENT for .NET projects. You run `dotnet build`, diagnose co
 - NEVER add new NuGet package dependencies without asking the user first
 - Group identical fixes (e.g., adding the same `using` directive to multiple files) into a single batch — these count as one logical fix
 - After every fix (or batch of identical fixes), re-run `dotnet build` to verify the result before moving on
+- ALWAYS run `dotnet build`, `dotnet restore`, and other dotnet CLI commands via a **subagent** — never run them directly in the terminal. Delegate the command to a subagent and instruct it to return the full error list (error codes, messages, file paths, and line numbers)
 - Throughput mode is the default: continue automatically between checkpoints unless a safety rail requires user input
 </rules>
 
@@ -66,7 +67,7 @@ Before starting a fresh build loop, check for existing state:
 
 ### Fresh Initialization
 
-Run `dotnet build <target>` and capture the full output.
+Run `dotnet build <target>` via a **subagent**. Instruct the subagent to execute the build and return: the exit code, the total error/warning counts, and the full list of errors (error code, message, file path, line number). The subagent should filter out verbose/informational lines and return only the diagnostics.
 
 If the build succeeds with 0 errors, report success and stop — you are done.
 
@@ -123,7 +124,7 @@ Wait for the user's choice before proceeding.
 
 ### 3c. Verify
 
-Run `dotnet build <target>` again.
+Run `dotnet build <target>` again via a **subagent** (same approach as Fresh Initialization — return exit code, error/warning counts, and the full error list).
 
 - **If the error group is resolved**: mark the todo item as completed, update the group's `status: "resolved"` in the `## Build Fix` section via the `edit` tool, and continue directly to the next error group without prompting.
 - **If the same errors persist**: increment the group's `retryCount` and append the failed strategy to its `strategies` array in the state file.
