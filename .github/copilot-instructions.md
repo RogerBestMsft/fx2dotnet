@@ -10,14 +10,14 @@ GitHub Copilot agent plugin that orchestrates .NET Framework → modern .NET mig
 - **Phase agents** (in `agents/`): Assessment → Planning → SDK Conversion → Package Compat → Multitarget → Web Migration, with Build Fix called throughout
 - **Skills** (in `skills/`): Domain policies (EF6 retention, System.Web adapters, Windows Service migration) — these override default behavior in specific migration domains
 - **MCP servers** (configured in `.mcp.json`): `Microsoft.GitHubCopilot.AppModernization.Mcp` for project analysis/SDK conversion, `Swick.Mcp.Fx2dotnet` for NuGet package compatibility data
-- **Source code** (`src/nugetversions/`): The NuGet versions MCP server — the only buildable project in this repo
+- **Source code** (`src/fx2dotnet/`): The NuGet versions MCP server — the only buildable project in this repo
 
 See [README.md](../README.md) for the full phase diagram and traversal order.
 
 ## Build and Test
 
 ```sh
-dotnet build fx2dotnet.slnx       # builds the nugetversions MCP server
+dotnet build fx2dotnet.slnx       # builds the fx2dotnet MCP server
 ```
 
 Pinned SDK: .NET 10 preview (see `global.json`). Output goes to `artifacts/` via `Directory.Build.props`.
