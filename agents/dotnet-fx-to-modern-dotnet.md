@@ -37,12 +37,13 @@ You are an ORCHESTRATION AGENT for .NET modernization. You enforce stage order a
 
 Each `{ProjectName}.md` file uses sections written by different agents:
 ```markdown
-## Classification          ← Project Type Detector
 ## SDK Conversion           ← SDK-Style Project Conversion
 ## Build Fix                ← Build Fix (transient — reset each invocation)
 ## Multitarget              ← Multitarget Migration
 ## Web Migration            ← ASP.NET Web Migration (web hosts only)
 ```
+
+Project classifications live in `.fx2dotnet/analysis.md` (written by Assessment), NOT in per-project files.
 
 ### File Operations
 - Use the `read` tool to check whether a state file exists (if the read fails, the file does not exist)
@@ -107,15 +108,14 @@ Do not duplicate data that lives in other `.fx2dotnet/` files (assessment report
 
 Invoke the **Assessment of .NET Solution for Migration** subagent with the solutionPath.
 The subagent writes its outputs to:
-- `.fx2dotnet/analysis.md` — the full assessment report
+- `.fx2dotnet/analysis.md` — the full assessment report (includes project classifications)
 - `.fx2dotnet/package-updates.md` — package compatibility findings (feeds, compatibility cards, unsupported libs, out-of-scope items)
-- `.fx2dotnet/{ProjectName}.md` `## Classification` section — per-project classification
 
 After the subagent completes:
-- Read `.fx2dotnet/analysis.md` to confirm it was written and contains the topological project order and dependency layers
+- Read `.fx2dotnet/analysis.md` to confirm it was written and contains the topological project order, dependency layers, and project classifications
 - Read `.fx2dotnet/package-updates.md` to confirm package compatibility findings were written
 
-If the topological project order or dependency layers are empty or missing from the analysis, report the error and ask user whether to retry or stop.
+If the topological project order, dependency layers, or project classifications are empty or missing from the analysis, report the error and ask user whether to retry or stop.
 
 Update `lastCompletedPhase: "assessment"` in `.fx2dotnet/plan.md` via the `edit` tool.
 

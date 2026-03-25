@@ -18,9 +18,8 @@ You are a .NET migration assessment specialist. Your job is to gather informatio
 - All `.fx2dotnet/` paths are relative to `{solutionDir}`
 
 ### Output Files
-- `.fx2dotnet/analysis.md` — full assessment report
+- `.fx2dotnet/analysis.md` — full assessment report (includes project classifications)
 - `.fx2dotnet/package-updates.md` — package compatibility findings (feeds, cards, unsupported libs, out-of-scope items)
-- `.fx2dotnet/{ProjectName}.md` — per-project state (classification written to `## Classification` section by Project Type Detector)
 
 ### File Operations
 - Use the `read` tool to check whether a state file exists (if the read fails, the file does not exist)
@@ -109,15 +108,15 @@ Include both `topologicalProjects` and `dependencyLayers` in `.fx2dotnet/analysi
 
 ### 6. Classify Each Project
 
-For each project in the topological order, invoke the **Project Type Detector** subagent with the project path.
+Invoke the **Project Type Detector** subagent for every project in the topological order. Since each classification is independent, invoke all subagents **in parallel** rather than sequentially. This is delegated to subagents because legacy project files can be very large and would exhaust the context window if read inline.
 
 The subagent returns:
 - `sdkStyle` — whether the project uses SDK-style format (yes/no)
-- `classification` — `web-app-host`, `windows-service`, `class-library`, `console-app`, `winforms-app`, `wpf-app`, or `uncertain`
+- `classification` — `web-app-host`, `web-library`, `windows-service`, `class-library`, `console-app`, `winforms-app`, `wpf-app`, or `uncertain`
 - `confidence` — high, medium, or low
 - `evidence` — supporting indicators
 
-Record results for each project. If any classification is `uncertain`, include it in the output for user review.
+Collect all classification results and include them in the Project Classifications table in `.fx2dotnet/analysis.md`. If any classification is `uncertain`, include it in the output for user review.
 
 ### 7. Package Compatibility Analysis
 
@@ -192,11 +191,47 @@ Include these in the output as a dedicated section so the migration plan does no
 
 After all assessment work is complete, write the results to `.fx2dotnet/` files:
 
-1. Write the full assessment report (all sections below) to `.fx2dotnet/analysis.md` using the `edit` tool
+1. Write the full assessment report to `.fx2dotnet/analysis.md` using the `edit` tool — follow the **analysis.md template** below exactly
 2. Write the package compatibility findings (NuGet Feeds, Compatibility Cards, Unsupported Libraries, Out-of-Scope Items) to `.fx2dotnet/package-updates.md` using the `edit` tool
-3. For each project classification, verify that `.fx2dotnet/{ProjectName}.md` has a `## Classification` section written by the Project Type Detector subagent — if any are missing, write them now
 
 These files enable the orchestrator and downstream agents to resume from a completed assessment without re-running it.
+
+## analysis.md Template
+
+Write `.fx2dotnet/analysis.md` using this exact structure:
+
+```markdown
+# Assessment Report
+
+## Solution
+- Path: {solutionPath}
+- Target: {targetFramework}
+- Projects: {count}
+
+## Topological Project Order
+1. {project path}
+2. {project path}
+...
+
+## Dependency Layers
+
+### Layer 1
+- {project path}
+- {project path}
+
+### Layer 2
+- {project path}
+
+...
+
+Unresolved/Cycles: ← omit section if none
+- {project path}
+
+## Project Classifications
+| # | Project | SDK-Style | Classification | Confidence | Evidence |
+|---|---------|-----------|----------------|------------|----------|
+| 1 | {path}  | yes/no    | web-app-host / web-library / windows-service / class-library / console-app / winforms-app / wpf-app / uncertain | high/medium/low | {summary} |
+```
 
 ## Output Format
 
@@ -204,48 +239,9 @@ Return the assessment report path, topological project order, project classifica
 
 ```
 📄 Assessment complete:
-   assessment.md → {full_path}
-   topologicalProjects → [{ordered list of project paths}]
-   dependencyLayers →
-     Layer 1: [{projects with no in-solution dependencies}]
-     Layer 2: [{projects depending only on Layer 1}]
-     ...
-
-## Dependency Layers
-
-Layer 1:
-- {project path}
-- {project path}
-
-Layer 2:
-- {project path}
-
-...
-
-Unresolved/Cycles: ← omit if none
-- {project path}
-
-## Project Classifications
-| # | Project | SDK-Style | Classification | Confidence | Evidence |
-|---|---------|-----------|----------------|------------|----------|
-| 1 | {path}  | yes/no    | web-app-host / windows-service / class-library / console-app / winforms-app / wpf-app / uncertain | high/medium/low | {summary} |
-
-# Package Compatibility Findings
-
-## NuGet Feeds
-| Feed | URL | Source Config |
-
-## Project Scope
-Included: {list}
-Excluded: {list with reasons}
-
-## Compatibility Cards
-| Package | Current | Supports Target | Min Compatible Version | Legacy Content | Install Script | Feed |
-
-## Unsupported Libraries
-| Package | Current | Projects | Notes |
-
-## Out-of-Scope Items
-| Item | Found In | Reason | Post-Migration Action |
-|------|----------|--------|-----------------------|
+   analysis.md → {full_path}
+   package-updates.md → {full_path}
+   topologicalProjects → [{ordered list}]
+   dependencyLayers → Layer 1: [...], Layer 2: [...], ...
+   classifications → {count} projects classified ({uncertain_count} uncertain)
 ```
