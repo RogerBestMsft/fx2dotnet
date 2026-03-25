@@ -97,7 +97,7 @@ If no projects are returned or the tool errors, report the error.
 
 ### 5b. Compute Dependency Layers
 
-After obtaining the topological project order, extract `<ProjectReference>` paths from each project file (using the `read` tool) to build a dependency map. For each project in the topological list, collect the `ProjectReference Include` paths and resolve them to workspace-relative paths matching the topological project list.
+After obtaining the topological project order, call `get_project_dependencies` for all projects in parallel (passing the solution path and each project path) to collect their project references. From the returned dependencies, extract the project-type dependencies to build a dependency map.
 
 Call `ComputeDependencyLayers` with the gathered project-dependency data:
 - Each entry: `{ projectPath: "<workspace-relative path>", dependencies: ["<dep1>", "<dep2>", ...] }`
