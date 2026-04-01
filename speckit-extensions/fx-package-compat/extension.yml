@@ -15,7 +15,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-package-compat.migrate"
-      file: "../../agents/package-compat-core.agent.md"
+      file: "agents/package-compat-core.agent.md"
       description: "Apply a chunked package compatibility migration plan."
 
 tags:

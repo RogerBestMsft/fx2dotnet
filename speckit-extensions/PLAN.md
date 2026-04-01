@@ -44,82 +44,64 @@ speckit-extensions/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── run.md
+│   └── CHANGELOG.md
 │
 ├── fx-assessment/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── run.md
+│   └── CHANGELOG.md
 │
 ├── fx-migration-planner/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── plan.md
+│   └── CHANGELOG.md
 │
 ├── fx-sdk-conversion/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── convert.md
+│   └── CHANGELOG.md
 │
 ├── fx-package-compat/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── migrate.md
+│   └── CHANGELOG.md
 │
 ├── fx-multitarget/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── migrate.md
+│   └── CHANGELOG.md
 │
 ├── fx-aspnet-web/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── migrate.md
+│   └── CHANGELOG.md
 │
 ├── fx-build-fix/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── fix.md
+│   └── CHANGELOG.md
 │
 ├── fx-route-inventory/
 │   ├── extension.yml
 │   ├── README.md
 │   ├── LICENSE
-│   ├── CHANGELOG.md
-│   └── commands/
-│       └── scan.md
+│   └── CHANGELOG.md
 │
 └── fx-project-detector/
     ├── extension.yml
     ├── README.md
     ├── LICENSE
-    ├── CHANGELOG.md
-    └── commands/
-        └── classify.md
+    └── CHANGELOG.md
 ```
+
+Command files are not duplicated in `speckit-extensions/`. Each `extension.yml` references the canonical agent file under `agents/` at the repo root. The CI packaging workflow stages `agents/`, `skills/`, and the built `Swick.Mcp.Fx2dotnet` NuGet package into each extension zip at build time.
 
 ---
 

@@ -20,7 +20,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-sdk-conversion.convert"
-      file: "../../agents/sdk-project-conversion.agent.md"
+      file: "agents/sdk-project-conversion.agent.md"
       description: "Convert a legacy project to SDK-style format and hand off build repair."
 
 tags:

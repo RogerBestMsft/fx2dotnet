@@ -6,7 +6,7 @@ This extension wraps the legacy project normalization phase of the migration wor
 
 - Command: `speckit.fx-sdk-conversion.convert`
 - Argument hint: provide a `.sln`, `.csproj`, `.vbproj`, or `.fsproj` path.
-- Backing file: `agents/sdk-project-conversion.agent.md`
+- Backing file: `commands/convert.md`
 
 ## Tool Requirements
 

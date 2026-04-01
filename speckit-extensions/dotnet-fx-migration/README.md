@@ -6,7 +6,7 @@ This Spec-Kit extension wraps the repository's top-level migration orchestrator.
 
 - Command: `speckit.dotnet-fx-migration.run`
 - Argument hint: specify a `.sln` or `.slnx` path and optionally a target framework. The default target framework is `net10.0`.
-- Backing file: `agents/dotnet-fx-to-modern-dotnet.md`
+- Backing file: `commands/run.md`
 
 ## Phase Overview
 

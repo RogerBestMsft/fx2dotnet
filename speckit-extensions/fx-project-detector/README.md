@@ -6,7 +6,7 @@ This extension wraps the read-only project classification helper used by the ass
 
 - Command: `speckit.fx-project-detector.classify`
 - Argument hint: provide a project file path.
-- Backing file: `agents/project-type-detector.agent.md`
+- Backing file: `commands/classify.md`
 
 ## Intended Usage
 

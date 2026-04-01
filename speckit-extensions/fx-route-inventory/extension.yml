@@ -15,7 +15,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-route-inventory.scan"
-      file: "../../agents/legacy-web-route-inventory.agent.md"
+      file: "agents/legacy-web-route-inventory.agent.md"
       description: "Scan a legacy ASP.NET project and produce a structured endpoint inventory."
 
 tags:

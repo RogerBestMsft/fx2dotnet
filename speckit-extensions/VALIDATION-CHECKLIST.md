@@ -11,7 +11,7 @@ Use this checklist after creating or updating any extension in this folder.
 | ID pattern | `extension.id` matches `^[a-z0-9-]+$`. |
 | Version format | `extension.version` uses `X.Y.Z` exactly. |
 | Command name pattern | Each `provides.commands[].name` matches `^speckit\.[a-z0-9-]+\.[a-z0-9-]+$`. |
-| Command file exists | Each `provides.commands[].file` path resolves to an existing markdown file, including shared agent files under `agents/`. |
+| Command file exists | Each `provides.commands[].file` path resolves to an existing agent markdown file. In the repo, paths are relative to `agents/` at the repo root. In a deployed zip, they resolve within the staged zip layout (`agents/` at the zip root). |
 | MCP correctness | Only `fx-assessment` and `fx-sdk-conversion` declare `requires.tools`, and both declare both MCP servers as required. |
 | Skill guidance present | Command bodies for `fx-assessment`, `fx-migration-planner`, `fx-multitarget`, `fx-aspnet-web`, and `fx-build-fix` include conditional skill guidance. |
 | Non-invasive | `git diff --name-only` against the branch baseline shows only new files under `speckit-extensions/`. |
@@ -37,7 +37,7 @@ Use this checklist after creating or updating any extension in this folder.
 1. Confirm no existing files outside `speckit-extensions/` were modified.
 2. Confirm each extension folder contains only additive packaging artifacts.
 3. Confirm all manifests parse as valid YAML.
-4. Confirm all command paths resolve to the intended shared agent markdown under `agents/`.
+4. Confirm all command file paths in `extension.yml` match the agent filename under `agents/` in the repo root.
 5. Confirm README files for delegated-only extensions state that they are intended for orchestrator delegation rather than direct manual use.
 
 ## CLI Dry Run

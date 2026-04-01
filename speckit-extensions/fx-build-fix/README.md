@@ -6,7 +6,7 @@ This extension wraps the iterative build-repair loop used throughout the migrati
 
 - Command: `speckit.fx-build-fix.fix`
 - Argument hint: provide a `.sln`, `.csproj`, `.vbproj`, or `.fsproj` path.
-- Backing file: `agents/build-fix.agent.md`
+- Backing file: `commands/fix.md`
 
 ## Intended Usage
 

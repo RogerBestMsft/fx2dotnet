@@ -15,7 +15,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-migration-planner.plan"
-      file: "../../agents/migration-planner.agent.md"
+      file: "agents/migration-planner.agent.md"
       description: "Synthesize assessment findings into an actionable migration plan."
 
 tags:

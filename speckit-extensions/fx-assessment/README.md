@@ -6,7 +6,7 @@ This extension wraps the assessment phase of the fx2dotnet migration workflow. I
 
 - Command: `speckit.fx-assessment.run`
 - Argument hint: provide the solution path to assess.
-- Backing file: `agents/assessment.agent.md`
+- Backing file: `commands/run.md`
 
 ## What It Produces
 

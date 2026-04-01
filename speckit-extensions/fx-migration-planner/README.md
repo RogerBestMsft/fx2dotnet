@@ -6,7 +6,7 @@ This extension wraps the planner phase that converts assessment findings into an
 
 - Command: `speckit.fx-migration-planner.plan`
 - Argument hint: provide assessment content, ordered projects, dependency layers, solution path, and target framework.
-- Backing file: `agents/migration-planner.agent.md`
+- Backing file: `commands/plan.md`
 
 ## Intended Usage
 

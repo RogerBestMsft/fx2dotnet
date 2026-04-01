@@ -6,7 +6,7 @@ This extension wraps the package update execution phase of the migration workflo
 
 - Command: `speckit.fx-package-compat.migrate`
 - Argument hint: provide a solution path, target framework, and the prepared package update plan.
-- Backing file: `agents/package-compat-core.agent.md`
+- Backing file: `commands/migrate.md`
 
 ## Intended Usage
 

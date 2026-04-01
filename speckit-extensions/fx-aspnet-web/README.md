@@ -6,7 +6,7 @@ This extension wraps the web-host migration phase for classic ASP.NET applicatio
 
 - Command: `speckit.fx-aspnet-web.migrate`
 - Argument hint: provide the legacy web project path and optionally the solution path and target framework.
-- Backing file: `agents/aspnet-framework-to-aspnetcore-web-migration.agent.md`
+- Backing file: `commands/migrate.md`
 
 ## Intended Usage
 

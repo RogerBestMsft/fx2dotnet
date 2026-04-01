@@ -15,7 +15,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-project-detector.classify"
-      file: "../../agents/project-type-detector.agent.md"
+      file: "agents/project-type-detector.agent.md"
       description: "Classify a .NET project type and report SDK-style status."
 
 tags:

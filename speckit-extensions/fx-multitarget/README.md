@@ -6,7 +6,7 @@ This extension wraps the phase that adds modern target frameworks to compatible 
 
 - Command: `speckit.fx-multitarget.migrate`
 - Argument hint: provide a solution or project path and optionally the target frameworks to add.
-- Backing file: `agents/multitarget.agent.md`
+- Backing file: `commands/migrate.md`
 
 ## State
 

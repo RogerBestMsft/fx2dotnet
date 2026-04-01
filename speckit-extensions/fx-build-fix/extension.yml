@@ -15,7 +15,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-build-fix.fix"
-      file: "../../agents/build-fix.agent.md"
+      file: "agents/build-fix.agent.md"
       description: "Run a build and minimal-fix loop for a .NET project."
 
 tags:

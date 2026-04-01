@@ -15,7 +15,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-multitarget.migrate"
-      file: "../../agents/multitarget.agent.md"
+      file: "agents/multitarget.agent.md"
       description: "Add modern target frameworks to a project and fix compatibility issues incrementally."
 
 tags:

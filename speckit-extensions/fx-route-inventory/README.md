@@ -6,7 +6,7 @@ This extension wraps the read-only endpoint inventory step used by the web migra
 
 - Command: `speckit.fx-route-inventory.scan`
 - Argument hint: provide the legacy web project path or containing folder.
-- Backing file: `agents/legacy-web-route-inventory.agent.md`
+- Backing file: `commands/scan.md`
 
 ## Intended Usage
 

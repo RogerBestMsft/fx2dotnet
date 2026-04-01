@@ -20,7 +20,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-assessment.run"
-      file: "../../agents/assessment.agent.md"
+      file: "agents/assessment.agent.md"
       description: "Run a migration assessment against a .NET solution and write findings to .fx2dotnet/."
 
 tags:

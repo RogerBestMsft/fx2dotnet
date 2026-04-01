@@ -38,6 +38,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Download fx2dotnet NuGet package artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nuget
+          gh api \
+            --header "Accept: application/vnd.github+json" \
+            /repos/twsouthwick/fx2dotnet/actions/artifacts/6108918098/zip \
+            > artifacts/nuget/artifact.zip
+          unzip -jo artifacts/nuget/artifact.zip -d artifacts/nuget
+          rm artifacts/nuget/artifact.zip
+          if ! ls artifacts/nuget/*.nupkg 1>/dev/null 2>&1; then
+            echo "No .nupkg found in downloaded artifact"
+            exit 1
+          fi
+
       - name: Compute bundle name
         id: bundle_name
         shell: bash
@@ -56,11 +74,20 @@ jobs:
             extension_dir="$(dirname "${extension_yml}")"
             extension_name="$(basename "${extension_dir}")"
             zip_name="${extension_name}.zip"
+            zip_path="${PWD}/artifacts/extensions/${zip_name}"
 
-            # Zip from inside each extension directory so extension.yml is at the zip root.
+            # Stage: extension files + shared support files so extension.yml is at the zip root.
+            staging="${PWD}/artifacts/staging/${extension_name}"
+            mkdir -p "${staging}"
+            cp -r "${extension_dir}/." "${staging}/"
+            cp -r agents "${staging}/agents"
+            cp -r skills "${staging}/skills"
+            mkdir -p "${staging}/mcp"
+            cp artifacts/nuget/*.nupkg "${staging}/mcp/"
+
             (
-              cd "${extension_dir}"
-              zip -r "../../artifacts/extensions/${zip_name}" .
+              cd "${staging}"
+              zip -r "${zip_path}" .
             )
           done < <(find speckit-extensions -mindepth 2 -maxdepth 2 -type f -name extension.yml | sort)
 

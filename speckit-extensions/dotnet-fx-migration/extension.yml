@@ -15,7 +15,7 @@ requires:
 provides:
   commands:
     - name: "speckit.dotnet-fx-migration.run"
-      file: "../../agents/dotnet-fx-to-modern-dotnet.md"
+      file: "agents/dotnet-fx-to-modern-dotnet.md"
       description: "Start or resume a full .NET Framework to modern .NET migration for a solution."
 
 tags:

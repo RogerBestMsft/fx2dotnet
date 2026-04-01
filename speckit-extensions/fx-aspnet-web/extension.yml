@@ -15,7 +15,7 @@ requires:
 provides:
   commands:
     - name: "speckit.fx-aspnet-web.migrate"
-      file: "../../agents/aspnet-framework-to-aspnetcore-web-migration.agent.md"
+      file: "agents/aspnet-framework-to-aspnetcore-web-migration.agent.md"
       description: "Migrate a legacy ASP.NET Framework web host to a new ASP.NET Core project."
 
 tags:
