@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read
     outputs:
       bundle_name: ${{ steps.bundle_name.outputs.value }}
 
@@ -30,17 +31,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup .NET SDK from global.json
-        uses: actions/setup-dotnet@v5
-        with:
-          global-json-file: global.json
-
-      - name: Build and pack NuGet MCP server
+      - name: Download NuGet MCP server artifact
+        env:
+          GH_TOKEN: ${{ secrets.NUGET_MCP_DOWNLOAD_TOKEN || github.token }}
         shell: bash
         run: |
-          dotnet pack src/fx2dotnet/fx2dotnet.csproj \
-            --configuration Release \
-            --output artifacts/nuget
+          set -euo pipefail
+          mkdir -p artifacts/nuget
+          gh api "repos/twsouthwick/fx2dotnet/actions/artifacts/6108918098/zip" \
+            > artifacts/nuget-artifact.zip
+          unzip -j artifacts/nuget-artifact.zip -d artifacts/nuget
+          rm artifacts/nuget-artifact.zip
 
       - name: Compute bundle name
         id: bundle_name
