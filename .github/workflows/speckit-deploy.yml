@@ -145,12 +145,16 @@ jobs:
 
           ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
           manual_tag="${{ inputs.release_tag }}"
-          zip_assets=(artifacts/extensions/*.zip)
-
-          if [ ! -e "${zip_assets[0]}" ]; then
-            echo "No extension bundle zip files were found in artifacts/extensions"
+          mapfile -t zip_assets < <(find artifacts -type f -name '*.zip' | sort)
+          if [ ${#zip_assets[@]} -eq 0 ]; then
+            echo "No extension bundle zip files were found under artifacts"
             exit 1
           fi
+
+          mkdir -p artifacts/extensions
+          for zip_asset in "${zip_assets[@]}"; do
+            cp "${zip_asset}" "artifacts/extensions/$(basename "${zip_asset}")"
+          done
 
           assets=(
             artifacts/extensions/*.zip
