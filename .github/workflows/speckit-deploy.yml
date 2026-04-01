@@ -72,6 +72,14 @@ jobs:
           cp .github/scripts/deploy-extension-zips.sh artifacts/deployment-scripts/
           cp .github/scripts/deploy-extension-zips.ps1 artifacts/deployment-scripts/
 
+      - name: Create combined deployment package
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip -r artifacts/deployment-bundle-with-scripts-and-zips.zip \
+            artifacts/extensions \
+            artifacts/deployment-scripts
+
       - name: Upload deployment bundles artifact
         uses: actions/upload-artifact@v5
         with:
@@ -80,6 +88,7 @@ jobs:
             artifacts/extensions/*.zip
             artifacts/deployment-scripts/deploy-extension-zips.sh
             artifacts/deployment-scripts/deploy-extension-zips.ps1
+            artifacts/deployment-bundle-with-scripts-and-zips.zip
           if-no-files-found: error
 
   publish_release:
@@ -159,6 +168,7 @@ jobs:
             artifacts/extensions/*.zip
             artifacts/deployment-scripts/deploy-extension-zips.sh
             artifacts/deployment-scripts/deploy-extension-zips.ps1
+            artifacts/deployment-bundle-with-scripts-and-zips.zip
           )
 
           if [ ! -e "${assets[0]}" ]; then
