@@ -37,45 +37,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Download NuGet MCP server artifact
-        env:
-          GH_TOKEN: ${{ secrets.NUGET_MCP_DOWNLOAD_TOKEN || github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/nuget
-          gh api "repos/twsouthwick/fx2dotnet/actions/artifacts/6108918098/zip" \
-            > artifacts/nuget-artifact.zip
-          unzip -j artifacts/nuget-artifact.zip -d artifacts/nuget
-          rm artifacts/nuget-artifact.zip
-
       - name: Compute bundle name
         id: bundle_name
         shell: bash
         run: |
           short_sha="${GITHUB_SHA::8}"
           ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
-          echo "value=speckit-extensions-${ref_safe}-${short_sha}" >> "$GITHUB_OUTPUT"
+          echo "value=speckit-extension-zips-${ref_safe}-${short_sha}" >> "$GITHUB_OUTPUT"
 
-      - name: Create deployment bundle
+      - name: Create per-extension deployment bundles
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p artifacts
-          bundle_name="${{ steps.bundle_name.outputs.value }}"
-          zip -r "artifacts/${bundle_name}.zip" \
-            speckit-extensions \
-            agents \
-            skills \
-            .mcp.json \
-            plugin.json \
-            artifacts/nuget
+          mkdir -p artifacts/extensions
 
-      - name: Upload deployment bundle artifact
+          while IFS= read -r extension_yml; do
+            extension_dir="$(dirname "${extension_yml}")"
+            extension_name="$(basename "${extension_dir}")"
+            zip_name="${extension_name}.zip"
+
+            # Zip from inside each extension directory so extension.yml is at the zip root.
+            (
+              cd "${extension_dir}"
+              zip -r "../../artifacts/extensions/${zip_name}" .
+            )
+          done < <(find speckit-extensions -mindepth 2 -maxdepth 2 -type f -name extension.yml | sort)
+
+      - name: Upload deployment bundles artifact
         uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.bundle_name.outputs.value }}
-          path: artifacts/${{ steps.bundle_name.outputs.value }}.zip
+          path: artifacts/extensions/*.zip
           if-no-files-found: error
 
   publish_release:
@@ -92,11 +84,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download deployment bundle artifact
+      - name: Download deployment bundles artifact
         uses: actions/download-artifact@v5
         with:
           name: ${{ needs.bundle.outputs.bundle_name }}
-          path: artifacts
+          path: artifacts/extensions
 
       - name: Generate release notes
         id: release_notes
@@ -142,7 +134,7 @@ jobs:
           # Write to a file to avoid quoting issues with gh release create
           echo "${notes}" > artifacts/release-notes.md
 
-      - name: Create GitHub release and upload bundle
+      - name: Create GitHub release and upload bundles
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -151,7 +143,12 @@ jobs:
 
           ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
           manual_tag="${{ inputs.release_tag }}"
-          asset="artifacts/${{ needs.bundle.outputs.bundle_name }}.zip"
+          assets=(artifacts/extensions/*.zip)
+
+          if [ ! -e "${assets[0]}" ]; then
+            echo "No extension bundle zip files were found in artifacts/extensions"
+            exit 1
+          fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             tag="${GITHUB_REF_NAME}"
@@ -160,7 +157,7 @@ jobs:
               --repo "${GITHUB_REPOSITORY}" \
               --title "${title}" \
               --notes-file artifacts/release-notes.md \
-              "${asset}"
+              "${assets[@]}"
           else
             if [ -n "${manual_tag}" ]; then
               tag="${manual_tag}"
@@ -173,5 +170,5 @@ jobs:
               --title "${title}" \
               --notes-file artifacts/release-notes.md \
               --prerelease \
-              "${asset}"
+              "${assets[@]}"
           fi
