@@ -10,6 +10,7 @@ on:
     paths:
       - "speckit-extensions/**"
       - "agents/**"
+      - ".github/scripts/**"
       - ".github/workflows/speckit-deploy.yml"
   workflow_dispatch:
     inputs:
@@ -63,11 +64,22 @@ jobs:
             )
           done < <(find speckit-extensions -mindepth 2 -maxdepth 2 -type f -name extension.yml | sort)
 
+      - name: Stage deployment scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/deployment-scripts
+          cp .github/scripts/deploy-extension-zips.sh artifacts/deployment-scripts/
+          cp .github/scripts/deploy-extension-zips.ps1 artifacts/deployment-scripts/
+
       - name: Upload deployment bundles artifact
         uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.bundle_name.outputs.value }}
-          path: artifacts/extensions/*.zip
+          path: |
+            artifacts/extensions/*.zip
+            artifacts/deployment-scripts/deploy-extension-zips.sh
+            artifacts/deployment-scripts/deploy-extension-zips.ps1
           if-no-files-found: error
 
   publish_release:
@@ -88,7 +100,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: ${{ needs.bundle.outputs.bundle_name }}
-          path: artifacts/extensions
+          path: artifacts
 
       - name: Generate release notes
         id: release_notes
@@ -143,7 +155,11 @@ jobs:
 
           ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
           manual_tag="${{ inputs.release_tag }}"
-          assets=(artifacts/extensions/*.zip)
+          assets=(
+            artifacts/extensions/*.zip
+            artifacts/deployment-scripts/deploy-extension-zips.sh
+            artifacts/deployment-scripts/deploy-extension-zips.ps1
+          )
 
           if [ ! -e "${assets[0]}" ]; then
             echo "No extension bundle zip files were found in artifacts/extensions"
