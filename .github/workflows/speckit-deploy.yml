@@ -64,31 +64,12 @@ jobs:
             )
           done < <(find speckit-extensions -mindepth 2 -maxdepth 2 -type f -name extension.yml | sort)
 
-      - name: Stage deployment scripts
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/deployment-scripts
-          cp .github/scripts/deploy-extension-zips.sh artifacts/deployment-scripts/
-          cp .github/scripts/deploy-extension-zips.ps1 artifacts/deployment-scripts/
-
-      - name: Create combined deployment package
-        shell: bash
-        run: |
-          set -euo pipefail
-          zip -r artifacts/deployment-bundle-with-scripts-and-zips.zip \
-            artifacts/extensions \
-            artifacts/deployment-scripts
-
       - name: Upload deployment bundles artifact
         uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.bundle_name.outputs.value }}
           path: |
             artifacts/extensions/*.zip
-            artifacts/deployment-scripts/deploy-extension-zips.sh
-            artifacts/deployment-scripts/deploy-extension-zips.ps1
-            artifacts/deployment-bundle-with-scripts-and-zips.zip
           if-no-files-found: error
 
   publish_release:
@@ -164,33 +145,96 @@ jobs:
 
           ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
           manual_tag="${{ inputs.release_tag }}"
-          assets=(
-            artifacts/extensions/*.zip
-            artifacts/deployment-scripts/deploy-extension-zips.sh
-            artifacts/deployment-scripts/deploy-extension-zips.ps1
-            artifacts/deployment-bundle-with-scripts-and-zips.zip
-          )
+          zip_assets=(artifacts/extensions/*.zip)
 
-          if [ ! -e "${assets[0]}" ]; then
+          if [ ! -e "${zip_assets[0]}" ]; then
             echo "No extension bundle zip files were found in artifacts/extensions"
             exit 1
           fi
 
+          assets=(
+            artifacts/extensions/*.zip
+          )
+
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             tag="${GITHUB_REF_NAME}"
-            title="Speckit deployment bundle (${tag})"
-            gh release create "${tag}" \
-              --repo "${GITHUB_REPOSITORY}" \
-              --title "${title}" \
-              --notes-file artifacts/release-notes.md \
-              "${assets[@]}"
           else
             if [ -n "${manual_tag}" ]; then
               tag="${manual_tag}"
             else
               tag="speckit-${ref_safe}-${GITHUB_RUN_NUMBER}"
             fi
-            title="Speckit deployment bundle (${tag})"
+          fi
+
+          mkdir -p artifacts/deployment-scripts
+          mapfile -t zip_names < <(find artifacts/extensions -maxdepth 1 -type f -name '*.zip' -printf '%f\n' | sort)
+
+          bash_script="artifacts/deployment-scripts/deploy-extension-zips-${tag}.sh"
+          ps1_script="artifacts/deployment-scripts/deploy-extension-zips-${tag}.ps1"
+          release_base_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}"
+
+          {
+            echo '#!/usr/bin/env bash'
+            echo 'set -euo pipefail'
+            echo
+            echo "release_base_url=\"${release_base_url}\""
+            echo 'assets=('
+            for zip_name in "${zip_names[@]}"; do
+              echo "  \"${zip_name}\""
+            done
+            echo ')'
+            echo
+            echo 'if ! command -v specify >/dev/null 2>&1; then'
+            echo '  echo "The '\''specify'\'' CLI is not installed or not on PATH."'
+            echo '  exit 1'
+            echo 'fi'
+            echo
+            echo 'for asset in "${assets[@]}"; do'
+            echo '  extension_name="${asset%.zip}"'
+            echo '  asset_url="${release_base_url}/${asset}"'
+            echo '  echo "Deploying ${extension_name} from ${asset_url}"'
+            echo '  specify extension add "${extension_name}" --from "${asset_url}"'
+            echo 'done'
+          } > "${bash_script}"
+
+          {
+            echo '[CmdletBinding()]'
+            echo 'param()'
+            echo
+            echo '$ErrorActionPreference = "Stop"'
+            echo
+            echo '$specify = Get-Command -Name specify -ErrorAction SilentlyContinue'
+            echo 'if (-not $specify) {'
+            echo '    Write-Error "The '\''specify'\'' CLI is not installed or not on PATH."'
+            echo '}'
+            echo
+            echo "\$releaseBaseUrl = \"${release_base_url}\""
+            echo '$assets = @('
+            for zip_name in "${zip_names[@]}"; do
+              echo "    \"${zip_name}\"," 
+            done
+            echo ')'
+            echo
+            echo 'foreach ($asset in $assets) {'
+            echo '    $extensionName = [System.IO.Path]::GetFileNameWithoutExtension($asset)'
+            echo '    $assetUrl = "$releaseBaseUrl/$asset"'
+            echo '    Write-Host "Deploying $extensionName from $assetUrl"'
+            echo '    specify extension add $extensionName --from $assetUrl'
+            echo '}'
+          } > "${ps1_script}"
+
+          chmod +x "${bash_script}"
+
+          assets+=("${bash_script}" "${ps1_script}")
+
+          title="Speckit deployment bundle (${tag})"
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            gh release create "${tag}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "${title}" \
+              --notes-file artifacts/release-notes.md \
+              "${assets[@]}"
+          else
             gh release create "${tag}" \
               --repo "${GITHUB_REPOSITORY}" \
               --title "${title}" \
