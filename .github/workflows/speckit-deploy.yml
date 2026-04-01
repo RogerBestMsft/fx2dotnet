@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - spec-kit-multi-ext
+    tags:
+      - "speckit-*"
     paths:
       - "speckit-extensions/**"
       - "agents/**"
@@ -16,6 +18,10 @@ on:
         required: true
         default: false
         type: boolean
+      release_tag:
+        description: "Optional release tag for manual publish (for example: speckit-spec-kit-multi-ext-42)"
+        required: false
+        type: string
 
 jobs:
   bundle:
@@ -76,7 +82,7 @@ jobs:
     name: Publish Speckit Deployment Prerelease
     runs-on: ubuntu-latest
     needs: bundle
-    if: github.event_name == 'workflow_dispatch' && inputs.publish_release == true
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.publish_release == true)
     permissions:
       contents: write
 
@@ -136,7 +142,7 @@ jobs:
           # Write to a file to avoid quoting issues with gh release create
           echo "${notes}" > artifacts/release-notes.md
 
-      - name: Create prerelease tag and upload bundle
+      - name: Create GitHub release and upload bundle
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -144,13 +150,28 @@ jobs:
           set -euo pipefail
 
           ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
-          tag="speckit-${ref_safe}-${GITHUB_RUN_NUMBER}"
-          title="Speckit deployment bundle (${ref_safe}) #${GITHUB_RUN_NUMBER}"
+          manual_tag="${{ inputs.release_tag }}"
           asset="artifacts/${{ needs.bundle.outputs.bundle_name }}.zip"
 
-          gh release create "${tag}" \
-            --repo "${GITHUB_REPOSITORY}" \
-            --title "${title}" \
-            --notes-file artifacts/release-notes.md \
-            --prerelease \
-            "${asset}"
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            tag="${GITHUB_REF_NAME}"
+            title="Speckit deployment bundle (${tag})"
+            gh release create "${tag}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "${title}" \
+              --notes-file artifacts/release-notes.md \
+              "${asset}"
+          else
+            if [ -n "${manual_tag}" ]; then
+              tag="${manual_tag}"
+            else
+              tag="speckit-${ref_safe}-${GITHUB_RUN_NUMBER}"
+            fi
+            title="Speckit deployment bundle (${tag})"
+            gh release create "${tag}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "${title}" \
+              --notes-file artifacts/release-notes.md \
+              --prerelease \
+              "${asset}"
+          fi
