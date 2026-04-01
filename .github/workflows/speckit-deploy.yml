@@ -214,8 +214,13 @@ jobs:
             echo
             echo "\$releaseBaseUrl = \"${release_base_url}\""
             echo '$assets = @('
-            for zip_name in "${zip_names[@]}"; do
-              echo "    \"${zip_name}\"," 
+            for i in "${!zip_names[@]}"; do
+              zip_name="${zip_names[$i]}"
+              if [ "$i" -lt "$((${#zip_names[@]} - 1))" ]; then
+                echo "    \"${zip_name}\"," 
+              else
+                echo "    \"${zip_name}\""
+              fi
             done
             echo ')'
             echo
