@@ -1,0 +1,35 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-migration"
+  name: "fx2dotnet Modernization"
+  version: "0.1.0"
+  description: "A GitHub Copilot agent plugin that guides developers through migrating .NET Framework applications to modern .NET (targeting .NET 10 by default)."
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-migration.orchestrate"
+      file: "agents/dotnet-fx-to-modern-dotnet.md"
+      description: "Run the end-to-end .NET Framework to modern .NET migration workflow."
+    - name: "speckit.fx2dotnet-migration.assessment"
+      file: "agents/assessment.agent.md"
+      description: "Assess a .NET solution for migration readiness, blockers, and package compatibility."
+    - name: "speckit.fx2dotnet-migration.planning"
+      file: "agents/migration-planner.agent.md"
+      description: "Build a phased migration plan from the assessment results."
+    - name: "speckit.fx2dotnet-migration.sdk-conversion"
+      file: "agents/sdk-project-conversion.agent.md"
+      description: "Convert a legacy project to SDK-style format and fix resulting build issues."
+    - name: "speckit.fx2dotnet-migration.package-compat"
+      file: "agents/package-compat-core.agent.md"
+      description: "Apply a planned package compatibility update sequence to the solution."
+    - name: "speckit.fx2dotnet-migration.multitarget"
+      file: "agents/multitarget.agent.md"
+      description: "Add modern .NET multitargeting to a project with minimal compatibility fixes."
+    - name: "speckit.fx2dotnet-migration.web-migration"
+      file: "agents/aspnet-framework-to-aspnetcore-web-migration.agent.md"
+      description: "Migrate an ASP.NET Framework web application toward ASP.NET Core incrementally."

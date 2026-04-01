@@ -1,0 +1,5 @@
+Directory.Build.props
+Directory.Build.targets
+.github/
+spec-kit/
+artifacts/
