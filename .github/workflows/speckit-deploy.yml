@@ -1,0 +1,155 @@
+name: Speckit Extensions Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - spec-kit-multi-ext
+    paths:
+      - "speckit-extensions/**"
+      - "agents/**"
+      - ".github/workflows/speckit-deploy.yml"
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: "Publish deployment bundle as a GitHub prerelease"
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  bundle:
+    name: Bundle Speckit Extensions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      bundle_name: ${{ steps.bundle_name.outputs.value }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK from global.json
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Build and pack NuGet MCP server
+        shell: bash
+        run: |
+          dotnet pack src/fx2dotnet/fx2dotnet.csproj \
+            --configuration Release \
+            --output artifacts/nuget
+
+      - name: Compute bundle name
+        id: bundle_name
+        shell: bash
+        run: |
+          short_sha="${GITHUB_SHA::8}"
+          ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
+          echo "value=speckit-extensions-${ref_safe}-${short_sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Create deployment bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          bundle_name="${{ steps.bundle_name.outputs.value }}"
+          zip -r "artifacts/${bundle_name}.zip" \
+            speckit-extensions \
+            agents \
+            skills \
+            .mcp.json \
+            plugin.json \
+            artifacts/nuget
+
+      - name: Upload deployment bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.bundle_name.outputs.value }}
+          path: artifacts/${{ steps.bundle_name.outputs.value }}.zip
+          if-no-files-found: error
+
+  publish_release:
+    name: Publish Speckit Deployment Prerelease
+    runs-on: ubuntu-latest
+    needs: bundle
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_release == true
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download deployment bundle artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.bundle.outputs.bundle_name }}
+          path: artifacts
+
+      - name: Generate release notes
+        id: release_notes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Find the previous speckit release tag on this branch, fall back to the
+          # first commit if none exists yet.
+          ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
+          prev_tag="$(git tag --list "speckit-${ref_safe}-*" --sort=-version:refname | head -1)"
+
+          if [ -n "${prev_tag}" ]; then
+            range="${prev_tag}..HEAD"
+          else
+            range="HEAD"
+          fi
+
+          # Extension versions from catalog-fragment.json
+          ext_table="$(jq -r '
+            .extensions | to_entries[] |
+            "| \(.value.id) | \(.value.version) |"
+          ' speckit-extensions/catalog-fragment.json)"
+
+          # Commits touching speckit-extensions/ or agents/ since last release
+          commit_log="$(git log "${range}" --oneline -- speckit-extensions/ agents/ 2>/dev/null || true)"
+
+          notes="## Extensions included
+
+          | Extension | Version |
+          |---|---|
+          ${ext_table}
+
+          ## Changes since last release
+
+          $([ -n "${commit_log}" ] && echo "${commit_log}" || echo "_No prior release on this branch — initial deployment._")
+
+          ---
+          Branch: \`${GITHUB_REF_NAME}\`
+          Commit: \`${GITHUB_SHA}\`
+          Run: [#${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+
+          # Write to a file to avoid quoting issues with gh release create
+          echo "${notes}" > artifacts/release-notes.md
+
+      - name: Create prerelease tag and upload bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ref_safe="$(echo "${GITHUB_REF_NAME}" | tr '/_' '-' | tr -cd '[:alnum:]-')"
+          tag="speckit-${ref_safe}-${GITHUB_RUN_NUMBER}"
+          title="Speckit deployment bundle (${ref_safe}) #${GITHUB_RUN_NUMBER}"
+          asset="artifacts/${{ needs.bundle.outputs.bundle_name }}.zip"
+
+          gh release create "${tag}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "${title}" \
+            --notes-file artifacts/release-notes.md \
+            --prerelease \
+            "${asset}"
