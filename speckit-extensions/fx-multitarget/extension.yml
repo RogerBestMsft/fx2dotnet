@@ -1,0 +1,25 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-multitarget"
+  name: ".NET Multitarget Migration"
+  version: "0.1.0"
+  description: "Adds modern target frameworks to a .NET project, applies minimal compatibility fixes, and validates progress with delegated build repair."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+
+provides:
+  commands:
+    - name: "speckit.fx-multitarget.migrate"
+      file: "../../agents/multitarget.agent.md"
+      description: "Add modern target frameworks to a project and fix compatibility issues incrementally."
+
+tags:
+  - "dotnet"
+  - "multitarget"
+  - "migration"
+  - "frameworks"

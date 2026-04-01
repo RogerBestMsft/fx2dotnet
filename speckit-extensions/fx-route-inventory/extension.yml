@@ -1,0 +1,25 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-route-inventory"
+  name: "Legacy ASP.NET Route Inventory"
+  version: "0.1.0"
+  description: "Extracts a route and endpoint inventory from a legacy ASP.NET project, including controllers, route configuration, auth attributes, and request or response contracts."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+
+provides:
+  commands:
+    - name: "speckit.fx-route-inventory.scan"
+      file: "../../agents/legacy-web-route-inventory.agent.md"
+      description: "Scan a legacy ASP.NET project and produce a structured endpoint inventory."
+
+tags:
+  - "dotnet"
+  - "aspnet"
+  - "routes"
+  - "inventory"

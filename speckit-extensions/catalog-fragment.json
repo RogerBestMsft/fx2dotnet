@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "dotnet-fx-migration": {
+      "name": ".NET Framework to Modern .NET Migration",
+      "id": "dotnet-fx-migration",
+      "version": "0.1.0",
+      "description": "Orchestrates end-to-end .NET Framework to modern .NET migration via a 7-phase workflow.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "migration", "modernization", "aspnet"]
+    },
+    "fx-assessment": {
+      "name": ".NET Solution Assessment",
+      "id": "fx-assessment",
+      "version": "0.1.0",
+      "description": "Assesses a .NET solution for migration readiness, dependency structure, and package compatibility.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "assessment", "migration", "nuget"]
+    },
+    "fx-migration-planner": {
+      "name": ".NET Migration Planner",
+      "id": "fx-migration-planner",
+      "version": "0.1.0",
+      "description": "Synthesizes assessment findings into a phased migration plan.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "migration", "planning"]
+    },
+    "fx-sdk-conversion": {
+      "name": ".NET SDK-Style Project Conversion",
+      "id": "fx-sdk-conversion",
+      "version": "0.1.0",
+      "description": "Converts a legacy .NET project file to SDK-style format and hands off build repair.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "sdk", "conversion", "migration"]
+    },
+    "fx-package-compat": {
+      "name": ".NET Package Compatibility Migration",
+      "id": "fx-package-compat",
+      "version": "0.1.0",
+      "description": "Executes a chunked package compatibility migration plan and validates each chunk.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "nuget", "packages", "migration"]
+    },
+    "fx-multitarget": {
+      "name": ".NET Multitarget Migration",
+      "id": "fx-multitarget",
+      "version": "0.1.0",
+      "description": "Adds modern target frameworks to a project and fixes compatibility issues incrementally.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "multitarget", "migration", "frameworks"]
+    },
+    "fx-aspnet-web": {
+      "name": "ASP.NET Framework to ASP.NET Core Web Migration",
+      "id": "fx-aspnet-web",
+      "version": "0.1.0",
+      "description": "Migrates a legacy ASP.NET Framework web host to ASP.NET Core in controlled slices.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "aspnet", "migration", "aspnetcore"]
+    },
+    "fx-build-fix": {
+      "name": ".NET Build Fix",
+      "id": "fx-build-fix",
+      "version": "0.1.0",
+      "description": "Runs a build and minimal-fix loop to repair the current migration step.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "build", "fix", "migration"]
+    },
+    "fx-route-inventory": {
+      "name": "Legacy ASP.NET Route Inventory",
+      "id": "fx-route-inventory",
+      "version": "0.1.0",
+      "description": "Extracts a route and endpoint inventory from a legacy ASP.NET project.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "aspnet", "routes", "inventory"]
+    },
+    "fx-project-detector": {
+      "name": ".NET Project Type Detector",
+      "id": "fx-project-detector",
+      "version": "0.1.0",
+      "description": "Classifies a .NET project type and reports SDK-style status.",
+      "author": "fx2dotnet",
+      "repository": "https://github.com/RogerBestMSFT/fx2dotnet",
+      "download_url": "TBD",
+      "tags": ["dotnet", "classification", "project"]
+    }
+  }
+}

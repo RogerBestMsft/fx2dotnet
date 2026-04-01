@@ -1,0 +1,6 @@
+# User-local config overrides
+*-config.local.yml
+
+# OS artifacts
+.DS_Store
+Thumbs.db

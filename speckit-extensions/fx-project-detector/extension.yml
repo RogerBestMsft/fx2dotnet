@@ -1,0 +1,24 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-project-detector"
+  name: ".NET Project Type Detector"
+  version: "0.1.0"
+  description: "Classifies a .NET project as a web host, web library, Windows Service, or other project type and reports whether it already uses SDK-style format."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+
+provides:
+  commands:
+    - name: "speckit.fx-project-detector.classify"
+      file: "../../agents/project-type-detector.agent.md"
+      description: "Classify a .NET project type and report SDK-style status."
+
+tags:
+  - "dotnet"
+  - "classification"
+  - "project"

@@ -1,0 +1,30 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-sdk-conversion"
+  name: ".NET SDK-Style Project Conversion"
+  version: "0.1.0"
+  description: "Converts legacy .NET project files to SDK-style format and then delegates build repair for the converted project."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+  tools:
+    - name: "Microsoft.GitHubCopilot.AppModernization.Mcp"
+      required: true
+    - name: "Swick.Mcp.Fx2dotnet"
+      required: true
+
+provides:
+  commands:
+    - name: "speckit.fx-sdk-conversion.convert"
+      file: "../../agents/sdk-project-conversion.agent.md"
+      description: "Convert a legacy project to SDK-style format and hand off build repair."
+
+tags:
+  - "dotnet"
+  - "sdk"
+  - "conversion"
+  - "migration"

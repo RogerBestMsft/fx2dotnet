@@ -1,0 +1,24 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-migration-planner"
+  name: ".NET Migration Planner"
+  version: "0.1.0"
+  description: "Synthesizes assessment findings into a phased, risk-ordered migration plan covering SDK conversion, package compatibility, multitargeting, and ASP.NET Core migration."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+
+provides:
+  commands:
+    - name: "speckit.fx-migration-planner.plan"
+      file: "../../agents/migration-planner.agent.md"
+      description: "Synthesize assessment findings into an actionable migration plan."
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "planning"

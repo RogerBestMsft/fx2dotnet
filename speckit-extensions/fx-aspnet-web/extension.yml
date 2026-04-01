@@ -1,0 +1,25 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-aspnet-web"
+  name: "ASP.NET Framework to ASP.NET Core Web Migration"
+  version: "0.1.0"
+  description: "Migrates a legacy ASP.NET Framework web host to ASP.NET Core by inventorying endpoints, scaffolding a new host, and porting features in controlled slices."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+
+provides:
+  commands:
+    - name: "speckit.fx-aspnet-web.migrate"
+      file: "../../agents/aspnet-framework-to-aspnetcore-web-migration.agent.md"
+      description: "Migrate a legacy ASP.NET Framework web host to a new ASP.NET Core project."
+
+tags:
+  - "dotnet"
+  - "aspnet"
+  - "migration"
+  - "aspnetcore"

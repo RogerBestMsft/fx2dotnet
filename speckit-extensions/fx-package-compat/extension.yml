@@ -1,0 +1,25 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-package-compat"
+  name: ".NET Package Compatibility Migration"
+  version: "0.1.0"
+  description: "Applies a pre-built package compatibility plan to a .NET solution in controlled chunks and validates each chunk with Build Fix."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+
+provides:
+  commands:
+    - name: "speckit.fx-package-compat.migrate"
+      file: "../../agents/package-compat-core.agent.md"
+      description: "Apply a chunked package compatibility migration plan."
+
+tags:
+  - "dotnet"
+  - "nuget"
+  - "packages"
+  - "migration"

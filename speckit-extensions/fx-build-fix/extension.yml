@@ -1,0 +1,25 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-build-fix"
+  name: ".NET Build Fix"
+  version: "0.1.0"
+  description: "Runs a build and minimal-fix loop against a .NET project until the current migration step compiles or a safety gate stops execution."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+
+provides:
+  commands:
+    - name: "speckit.fx-build-fix.fix"
+      file: "../../agents/build-fix.agent.md"
+      description: "Run a build and minimal-fix loop for a .NET project."
+
+tags:
+  - "dotnet"
+  - "build"
+  - "fix"
+  - "migration"

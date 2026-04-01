@@ -1,0 +1,30 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx-assessment"
+  name: ".NET Solution Assessment"
+  version: "0.1.0"
+  description: "Assesses a .NET solution for migration by identifying frameworks, dependency layers, project types, route inventory needs, and NuGet package compatibility blockers."
+  author: "fx2dotnet"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.1.0"
+  tools:
+    - name: "Microsoft.GitHubCopilot.AppModernization.Mcp"
+      required: true
+    - name: "Swick.Mcp.Fx2dotnet"
+      required: true
+
+provides:
+  commands:
+    - name: "speckit.fx-assessment.run"
+      file: "../../agents/assessment.agent.md"
+      description: "Run a migration assessment against a .NET solution and write findings to .fx2dotnet/."
+
+tags:
+  - "dotnet"
+  - "assessment"
+  - "migration"
+  - "nuget"
