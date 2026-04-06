@@ -1,0 +1,84 @@
+name: Release Spec Kit Extensions
+
+on:
+  workflow_dispatch:
+
+# Only allow runs on the spec-kit-ext-general branch
+# (workflow_dispatch respects the branch the workflow file lives on)
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/spec-kit-ext-general'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK from global.json
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: |
+            **/*.csproj
+            global.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Version consistency check
+        run: python spec-kit/scripts/version-check.py
+
+      - name: Cross-reference audit
+        run: python spec-kit/scripts/cross-reference-audit.py
+
+      - name: Extract version from extension.yml
+        id: version
+        run: |
+          VERSION=$(python -c "
+          import yaml, pathlib
+          data = yaml.safe_load(pathlib.Path('spec-kit/fx-to-dotnet/extension.yml').read_text())
+          print(data['extension']['version'])
+          ")
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Detected version: $VERSION"
+
+      - name: Build MCP server (Release)
+        run: |
+          dotnet restore fx2dotnet.slnx
+          dotnet build fx2dotnet.slnx --configuration Release --no-restore
+
+      - name: Pack NuGet package
+        run: dotnet pack src/fx2dotnet/fx2dotnet.csproj --configuration Release --no-restore --output artifacts/nuget
+
+      - name: Package extensions
+        run: |
+          chmod +x spec-kit/scripts/package-extensions.sh
+          spec-kit/scripts/package-extensions.sh
+
+      - name: Generate catalog entries
+        run: python spec-kit/scripts/generate-catalog.py > catalog-entries.json
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: v${{ steps.version.outputs.VERSION }}
+          files: |
+            releases/*.zip
+            artifacts/nuget/*.nupkg
+          generate_release_notes: true
+
+      - name: Upload catalog entries artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-entries
+          path: catalog-entries.json

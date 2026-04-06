@@ -1,6 +1,9 @@
 # .NET build outputs
 artifacts/
 
+# Packaged extension archives
+releases/
+
 # User-specific files
 *.user
 *.suo

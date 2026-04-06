@@ -1,0 +1,18 @@
+schema_version: "1.0"
+extension:
+  id: "fx-to-dotnet-assess"
+  name: ".NET Migration Assessment"
+  version: "0.1.0"
+  description: "Gather solution info, identify frameworks, dependencies, blockers; classify projects; audit package compatibility"
+  author: "Microsoft"
+  repository: "https://github.com/AzureAD/fx-to-dotnet-extensions"
+  license: "MIT"
+requires:
+  speckit_version: ">=0.5.0"
+  tools:
+    - "Microsoft.GitHubCopilot.AppModernization.Mcp"
+    - "Swick.Mcp.Fx2dotnet"
+provides:
+  commands:
+    - name: "speckit.fx-to-dotnet-assess.assess"
+      file: "commands/assess.md"
