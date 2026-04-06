@@ -1,0 +1,49 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-build-fix"
+  name: "fx2dotnet Build Fix"
+  version: "1.0.0"
+  description: "Cross-phase build remediation — runs dotnet build, diagnoses compile errors, and applies minimal iterative fixes until the build succeeds. Invoked by SDK conversion, package compat, multitarget, and web migration phases."
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-build-fix"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+  commands:
+    - "speckit.fx2dotnet-support-core.resolve-solution-context"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-build-fix.diagnose-build"
+      file: "commands/diagnose-build.md"
+      description: "Run dotnet build via subagent and classify all errors into categorized error groups"
+
+    - name: "speckit.fx2dotnet-build-fix.apply-fix-pattern"
+      file: "commands/apply-fix-pattern.md"
+      description: "Apply the smallest possible fix to one classified error group"
+
+    - name: "speckit.fx2dotnet-build-fix.retry-build"
+      file: "commands/retry-build.md"
+      description: "Retry the build after a fix and evaluate whether the error group is resolved"
+
+  config:
+    - name: "fx2dotnet-build-fix-config.yml"
+      template: "fx2dotnet-build-fix-config.template.yml"
+      description: "Build fix configuration (retry limits, throughput mode)"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "build"
+  - "fix"
+  - "remediation"
+
+defaults:
+  build_fix:
+    max_retries_per_group: 3
+    throughput_mode: true
+    ask_before_new_packages: true

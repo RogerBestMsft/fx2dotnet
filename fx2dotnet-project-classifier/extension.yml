@@ -1,0 +1,42 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-project-classifier"
+  name: "fx2dotnet Project Classifier"
+  version: "1.0.0"
+  description: "Classify .NET projects by type (web host, library, console, Windows Service) and detect SDK-style format eligibility"
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-project-classifier"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-project-classifier.classify-project"
+      file: "commands/classify-project.md"
+      description: "Classify a project as web host, web library, Windows Service, console, or library and return evidence"
+
+    - name: "speckit.fx2dotnet-project-classifier.detect-sdk-style-status"
+      file: "commands/detect-sdk-style-status.md"
+      description: "Detect whether a project uses SDK-style format and whether conversion is applicable"
+
+  config:
+    - name: "fx2dotnet-project-classifier-config.yml"
+      template: "fx2dotnet-project-classifier-config.template.yml"
+      description: "Classifier configuration (confidence thresholds, uncertain handling)"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "modernization"
+  - "classification"
+  - "project-analysis"
+
+defaults:
+  classification:
+    uncertain_action: "needs-user-confirmation"
+    require_host_artifact_for_web_host: true

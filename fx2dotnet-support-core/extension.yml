@@ -1,0 +1,52 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-support-core"
+  name: "fx2dotnet Support Core"
+  version: "1.0.0"
+  description: "Shared foundation utilities for the fx2dotnet extension suite: state contract validation, solution path resolution, and MCP invocation wrappers"
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-support-core"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-support-core.validate-state-contract"
+      file: "commands/validate-state-contract.md"
+      description: "Validate that all required .fx2dotnet/ state files are present and structurally correct"
+
+    - name: "speckit.fx2dotnet-support-core.resolve-solution-context"
+      file: "commands/resolve-solution-context.md"
+      description: "Normalize solution path, derive solutionDir and stateRoot, validate inputs"
+
+    - name: "speckit.fx2dotnet-support-core.invoke-mcp-wrapper"
+      file: "commands/invoke-mcp-wrapper.md"
+      description: "Invoke an MCP tool with timeout, retry, and continuity-mode fallback handling"
+
+  config:
+    - name: "fx2dotnet-support-core-config.yml"
+      template: "fx2dotnet-support-core-config.template.yml"
+      description: "Support core configuration (timeouts, continuity mode, logging)"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "modernization"
+  - "foundation"
+  - "shared"
+
+defaults:
+  logging:
+    level: "info"
+  mcp:
+    timeout_seconds: 30
+    retry_count: 2
+  continuity:
+    mode: "normal"
+    allow_manual_mode: true
+    emit_risk_banner: true

@@ -1,0 +1,16 @@
+# fx2dotnet SDK Conversion Configuration
+# Created automatically on extension installation. Edit to customize SDK conversion behavior.
+
+conversion:
+  # Stop the phase immediately if one project fails conversion or validation
+  stop_on_per_project_failure: true
+
+  # Require build validation after each conversion
+  require_build_validation: true
+
+logging:
+  level: info
+
+# Environment Variable Overrides:
+# SPECKIT_FX2DOTNET_SDK_CONVERSION_CONVERSION_STOP_ON_PER_PROJECT_FAILURE
+# SPECKIT_FX2DOTNET_SDK_CONVERSION_CONVERSION_REQUIRE_BUILD_VALIDATION

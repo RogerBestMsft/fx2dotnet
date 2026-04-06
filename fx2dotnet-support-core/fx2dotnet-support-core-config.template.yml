@@ -1,0 +1,43 @@
+# fx2dotnet Support Core Configuration
+# Created automatically on extension installation. Edit to customize behavior.
+
+# Logging configuration
+logging:
+  level: info                           # Options: debug, info, warning, error
+  output: console                       # Options: console, file, none
+  file_path: .fx2dotnet/fx2dotnet.log   # Used when output: file
+
+# MCP tool invocation settings
+mcp:
+  # Per-tool invocation timeout in seconds
+  timeout_seconds: 30
+
+  # Number of retries before escalating to fallback mode
+  retry_count: 2
+
+  # Source priority list (in order of preference)
+  source_priority:
+    - external
+    - internal-mirror
+    - compatibility-fork
+
+# Continuity mode — controls what happens when an MCP tool is unavailable
+continuity:
+  # Mode options:
+  #   normal      — use primary external MCP source
+  #   fallback-a  — use internal mirror of same MCP package
+  #   fallback-b  — use compatibility fork
+  #   fallback-c  — use hybrid: extension-native scripts where MCP is unavailable
+  #   fallback-d  — manual mode: prompt user for MCP output
+  mode: normal
+
+  # Allow escalation to manual mode (fallback-d) if all automated fallbacks fail
+  allow_manual_mode: true
+
+  # Emit a warning banner when operating in any non-normal continuity mode
+  emit_risk_banner: true
+
+# Environment Variable Overrides:
+# SPECKIT_FX2DOTNET_SUPPORT_CORE_LOGGING_LEVEL
+# SPECKIT_FX2DOTNET_SUPPORT_CORE_MCP_TIMEOUT_SECONDS
+# SPECKIT_FX2DOTNET_SUPPORT_CORE_CONTINUITY_MODE

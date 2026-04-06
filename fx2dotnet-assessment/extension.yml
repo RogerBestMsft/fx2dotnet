@@ -1,0 +1,75 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-assessment"
+  name: "fx2dotnet Assessment"
+  version: "1.0.0"
+  description: "Phase 1 — Discover .NET Framework projects, classify by type, compute dependency layers, and audit package compatibility. Produces analysis.md and seeds package-updates.md."
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-assessment"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+  tools:
+    - name: "Microsoft.GitHubCopilot.AppModernization.Mcp"
+      version: ">=1.0.0"
+      required: true
+    - name: "Swick.Mcp.Fx2dotnet"
+      version: ">=0.1.0"
+      required: true
+  commands:
+    - "speckit.fx2dotnet-support-core.resolve-solution-context"
+    - "speckit.fx2dotnet-support-core.invoke-mcp-wrapper"
+    - "speckit.fx2dotnet-project-classifier.classify-project"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-assessment.run"
+      file: "commands/run.md"
+      description: "Run full solution assessment: invoke MCP scenario, classify projects, compute layers, audit packages"
+      aliases: ["speckit.fx2dotnet-assessment.analyze"]
+
+    - name: "speckit.fx2dotnet-assessment.compute-layers"
+      file: "commands/compute-layers.md"
+      description: "Compute dependency layers for all projects in topological order"
+
+    - name: "speckit.fx2dotnet-assessment.collect-package-baseline"
+      file: "commands/collect-package-baseline.md"
+      description: "Collect NuGet package baseline and compatibility cards for all projects"
+
+  config:
+    - name: "fx2dotnet-assessment-config.yml"
+      template: "fx2dotnet-assessment-config.template.yml"
+      description: "Assessment configuration (discovery depth, package analysis, logging)"
+      required: false
+
+hooks:
+  after_tasks:
+    command: "speckit.fx2dotnet-assessment.run"
+    optional: true
+    prompt: "Would you like to run the .NET migration assessment on this solution?"
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "modernization"
+  - "analysis"
+  - "discovery"
+  - "assessment"
+
+defaults:
+  logging:
+    level: "info"
+  discovery:
+    scan_depth: "unlimited"
+    include_test_projects: false
+  output:
+    include_dependency_graph: true
+    include_package_analysis: true
+  advanced:
+    mcp_timeout: 30
+    parallel_processing: false
+    use_cache: true
+    cache_duration_hours: 24

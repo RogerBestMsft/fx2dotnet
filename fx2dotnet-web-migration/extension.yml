@@ -1,0 +1,46 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-web-migration"
+  name: "fx2dotnet Web Migration"
+  version: "1.0.0"
+  description: "Phase 6 — Create a side-by-side ASP.NET Core host, port routes incrementally, and preserve endpoint behavior during migration from System.Web to ASP.NET Core."
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-web-migration"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+  commands:
+    - "speckit.fx2dotnet-web-route-inventory.inventory-routes"
+    - "speckit.fx2dotnet-build-fix.diagnose-build"
+    - "speckit.fx2dotnet-build-fix.apply-fix-pattern"
+    - "speckit.fx2dotnet-build-fix.retry-build"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-web-migration.scaffold-core-host"
+      file: "commands/scaffold-core-host.md"
+      description: "Scaffold a new ASP.NET Core host project side-by-side with the legacy web project"
+
+    - name: "speckit.fx2dotnet-web-migration.port-routes"
+      file: "commands/port-routes.md"
+      description: "Port routes and endpoints incrementally from the legacy web host to the new Core host"
+
+    - name: "speckit.fx2dotnet-web-migration.validate-web-host"
+      file: "commands/validate-web-host.md"
+      description: "Validate that the new ASP.NET Core host builds and preserves endpoint behavior"
+
+  config:
+    - name: "fx2dotnet-web-migration-config.yml"
+      template: "fx2dotnet-web-migration-config.template.yml"
+      description: "Web migration configuration"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "web"
+  - "aspnet-core"
+  - "systemweb"

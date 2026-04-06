@@ -1,0 +1,10 @@
+# fx2dotnet Web Route Inventory Configuration
+# Created automatically on extension installation. Edit to customize route inventory behavior.
+
+inventory:
+  include_asmx: true
+  include_aspx_endpoint_pages: true
+  include_modules: true
+
+logging:
+  level: info

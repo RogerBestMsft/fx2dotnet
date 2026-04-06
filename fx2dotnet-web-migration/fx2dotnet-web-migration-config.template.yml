@@ -1,0 +1,10 @@
+# fx2dotnet Web Migration Configuration
+# Created automatically on extension installation. Edit to customize web migration behavior.
+
+web_migration:
+  target_framework: net10.0
+  stop_after_plan_by_default: true
+  prefer_systemweb_adapters: true
+
+logging:
+  level: info

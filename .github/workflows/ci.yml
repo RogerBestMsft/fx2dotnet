@@ -1,4 +1,4 @@
-name: CI NuGet Pack
+name: CI
 
 on:
   push:
@@ -8,7 +8,63 @@ on:
   workflow_dispatch:
 
 jobs:
+  validate-extensions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK from global.json
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          cache: true
+          cache-dependency-path: |
+            **/*.csproj
+            global.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate extension manifests
+        shell: pwsh
+        run: ./scripts/validate-extensions.ps1 -ReportPath ./docs/release/manifest-validation-report.md -HookMapPath ./docs/release/hook-coordination-map.md -JsonPath ./artifacts/validation/extension-suite.json
+
+      - name: Build local runtime
+        shell: pwsh
+        run: ./scripts/build-mcp.ps1 -Configuration Release
+
+      - name: Stage runtime artifacts
+        shell: pwsh
+        run: ./scripts/stage-artifacts.ps1 -Configuration Release
+
+      - name: Package all extensions
+        shell: pwsh
+        run: |
+          $manifestPaths = Get-ChildItem ./packaging/artifact-manifests/*.json | Sort-Object Name
+          foreach ($manifestPath in $manifestPaths) {
+            ./scripts/package-extension.ps1 -ExtensionId $manifestPath.BaseName -OutputDir ./artifacts/packages
+          }
+
+      - name: Generate catalog snapshot
+        shell: pwsh
+        run: ./scripts/generate-catalog.ps1 -CatalogPath ./artifacts/catalog/catalog.json -InstallAllowed
+
+      - name: Upload extension artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fx2dotnet-extension-packages
+          path: |
+            artifacts/packages/*.zip
+            artifacts/packages/*.sha256
+            artifacts/catalog/catalog.json
+            artifacts/validation/extension-suite.json
+
   pack:
+    needs: validate-extensions
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,3 +101,4 @@ jobs:
         with:
           name: fx2dotnet-nuget
           path: artifacts/nuget/*.nupkg
+

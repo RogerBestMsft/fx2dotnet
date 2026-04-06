@@ -1,0 +1,107 @@
+name: Release Extensions
+
+on:
+  push:
+    tags:
+      - fx2dotnet-*-v*
+
+permissions:
+  contents: write
+
+jobs:
+  parse-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      extension-id: ${{ steps.parse.outputs.extension-id }}
+      version: ${{ steps.parse.outputs.version }}
+    steps:
+      - name: Parse release tag
+        id: parse
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if ($tag -notmatch '^(fx2dotnet-[a-z0-9-]+)-v(.+)$') {
+            throw "Invalid tag format: $tag"
+          }
+
+          "extension-id=$($Matches[1])" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "version=$($Matches[2])" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+  validate:
+    needs: parse-tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK from global.json
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Validate extension manifests
+        shell: pwsh
+        run: ./scripts/validate-extensions.ps1 -JsonPath ./artifacts/validation/extension-suite.json
+
+      - name: Build local runtime
+        shell: pwsh
+        run: ./scripts/build-mcp.ps1 -Configuration Release
+
+      - name: Stage runtime artifacts
+        shell: pwsh
+        run: ./scripts/stage-artifacts.ps1 -Configuration Release
+
+      - name: Package target extension
+        shell: pwsh
+        run: ./scripts/package-extension.ps1 -ExtensionId "${{ needs.parse-tag.outputs.extension-id }}" -Version "${{ needs.parse-tag.outputs.version }}" -OutputDir ./releases
+
+      - name: Upload release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-release-bundle
+          path: |
+            releases/*.zip
+            releases/*.sha256
+
+  publish:
+    needs: [parse-tag, validate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-release-bundle
+          path: ./releases
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            releases/*.zip
+            releases/*.sha256
+          generate_release_notes: true
+
+  update-catalog:
+    needs: [parse-tag, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate catalogs
+        shell: pwsh
+        run: ./scripts/generate-catalog.ps1 -ExtensionIds "${{ needs.parse-tag.outputs.extension-id }}" -InstallAllowed -IncludeCommunityMirror
+
+      - name: Commit catalog updates
+        shell: bash
+        run: |
+          if git diff --quiet -- catalogs/catalog.json catalogs/community-catalog.json; then
+            exit 0
+          fi
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add catalogs/catalog.json catalogs/community-catalog.json
+          git commit -m "chore: update extension catalogs for ${{ needs.parse-tag.outputs.extension-id }} v${{ needs.parse-tag.outputs.version }}"
+          git push

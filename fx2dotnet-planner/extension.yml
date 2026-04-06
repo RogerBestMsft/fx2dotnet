@@ -1,0 +1,45 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-planner"
+  name: "fx2dotnet Planner"
+  version: "1.0.0"
+  description: "Phase 2 — Synthesize assessment findings into an actionable, ordered migration plan. Chunks package updates by risk, orders SDK conversion by dependency layer, and identifies web migration candidates."
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-planner"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+  commands:
+    - "speckit.fx2dotnet-support-core.validate-state-contract"
+    - "speckit.fx2dotnet-assessment.run"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-planner.generate-plan"
+      file: "commands/generate-plan.md"
+      description: "Synthesize assessment output into an ordered, phased migration plan in plan.md"
+
+    - name: "speckit.fx2dotnet-planner.summarize-risks"
+      file: "commands/summarize-risks.md"
+      description: "Produce a risk summary from assessment data highlighting blockers and high-risk items"
+
+  config:
+    - name: "fx2dotnet-planner-config.yml"
+      template: "fx2dotnet-planner-config.template.yml"
+      description: "Planner configuration (chunk size, risk thresholds)"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "modernization"
+  - "planning"
+
+defaults:
+  planning:
+    max_packages_per_chunk: 5
+    stop_on_blocking_packages: true
+    require_user_approval_for_unsupported: true

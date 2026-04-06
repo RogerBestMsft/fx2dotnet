@@ -1,0 +1,59 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-orchestrator"
+  name: "fx2dotnet Orchestrator"
+  version: "1.0.0"
+  description: "Control-plane extension for the fx2dotnet suite. Starts, resumes, and monitors the end-to-end modernization workflow and enforces phase-gate order."
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-orchestrator"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+  commands:
+    - "speckit.fx2dotnet-support-core.validate-state-contract"
+    - "speckit.fx2dotnet-assessment.run"
+    - "speckit.fx2dotnet-planner.generate-plan"
+    - "speckit.fx2dotnet-sdk-conversion.convert-project"
+    - "speckit.fx2dotnet-package-compat.apply-package-chunk"
+    - "speckit.fx2dotnet-multitarget.add-target-frameworks"
+    - "speckit.fx2dotnet-web-migration.scaffold-core-host"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-orchestrator.start"
+      file: "commands/start.md"
+      description: "Start a new end-to-end modernization workflow"
+
+    - name: "speckit.fx2dotnet-orchestrator.resume"
+      file: "commands/resume.md"
+      description: "Resume a workflow from the last project-and-phase checkpoint"
+
+    - name: "speckit.fx2dotnet-orchestrator.show-status"
+      file: "commands/show-status.md"
+      description: "Display current phase progress and per-project status matrix"
+
+    - name: "speckit.fx2dotnet-orchestrator.validate-phase-gates"
+      file: "commands/validate-phase-gates.md"
+      description: "Validate that all gate conditions are satisfied before advancing phases"
+
+  config:
+    - name: "fx2dotnet-orchestrator-config.yml"
+      template: "fx2dotnet-orchestrator-config.template.yml"
+      description: "Orchestrator configuration (target framework, resume, gates)"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "modernization"
+  - "orchestration"
+  - "workflow"
+
+defaults:
+  orchestrator:
+    target_framework: "net10.0"
+    resume_behavior: "ask"
+    enforce_phase_gates: true

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0",
+  "extensionId": "fx2dotnet-project-classifier",
+  "sourceDirectory": "fx2dotnet-project-classifier",
+  "zipRoot": ".",
+  "includes": [
+    { "path": "extension.yml", "required": true },
+    { "path": "commands", "required": true },
+    { "path": "docs", "required": true },
+    { "path": "scripts", "required": true },
+    { "path": "fx2dotnet-project-classifier-config.template.yml", "required": true }
+  ],
+  "runtimeAssets": [],
+  "integrity": {
+    "checksumAlgorithm": "sha256"
+  }
+}

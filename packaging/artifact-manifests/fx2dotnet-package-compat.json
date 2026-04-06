@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0",
+  "extensionId": "fx2dotnet-package-compat",
+  "sourceDirectory": "fx2dotnet-package-compat",
+  "zipRoot": ".",
+  "includes": [
+    { "path": "extension.yml", "required": true },
+    { "path": "commands", "required": true },
+    { "path": "docs", "required": true },
+    { "path": "artifacts", "required": true },
+    { "path": "fx2dotnet-package-compat-config.template.yml", "required": true }
+  ],
+  "runtimeAssets": [
+    {
+      "assetId": "swick-mcp-release",
+      "sourcePath": "artifacts/bin/fx2dotnet/Release",
+      "targetPath": "artifacts/bin/fx2dotnet/Release",
+      "required": true
+    }
+  ],
+  "integrity": {
+    "checksumAlgorithm": "sha256"
+  }
+}

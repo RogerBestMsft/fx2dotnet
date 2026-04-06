@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0",
+  "extensionId": "fx2dotnet-web-route-inventory",
+  "sourceDirectory": "fx2dotnet-web-route-inventory",
+  "zipRoot": ".",
+  "includes": [
+    { "path": "extension.yml", "required": true },
+    { "path": "commands", "required": true },
+    { "path": "docs", "required": true },
+    { "path": "fx2dotnet-web-route-inventory-config.template.yml", "required": true }
+  ],
+  "runtimeAssets": [],
+  "integrity": {
+    "checksumAlgorithm": "sha256"
+  }
+}

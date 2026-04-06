@@ -1,0 +1,23 @@
+# fx2dotnet Project Classifier Configuration
+# Created automatically on extension installation. Edit to customize behavior.
+
+# Classification behavior
+classification:
+  # What to do when a project classification is uncertain
+  # Options: needs-user-confirmation | assume-library | assume-web-library | fail
+  uncertain_action: needs-user-confirmation
+
+  # Require at least one host-level artifact (Global.asax, web.config, RouteConfig)
+  # in addition to SDK/import signals before classifying as web-host
+  require_host_artifact_for_web_host: true
+
+  # Classify projects in .test. or .tests. folders as test projects
+  detect_test_projects: true
+
+# Logging
+logging:
+  level: info
+
+# Environment Variable Overrides:
+# SPECKIT_FX2DOTNET_PROJECT_CLASSIFIER_CLASSIFICATION_UNCERTAIN_ACTION
+# SPECKIT_FX2DOTNET_PROJECT_CLASSIFIER_LOGGING_LEVEL

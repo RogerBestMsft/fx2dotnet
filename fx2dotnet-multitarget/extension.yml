@@ -1,0 +1,53 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-multitarget"
+  name: "fx2dotnet Multitarget"
+  version: "1.0.0"
+  description: "Phase 5 — Add modern target frameworks to projects incrementally, address API gaps with minimal fixes, and validate through the build-fix loop."
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-multitarget"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+  commands:
+    - "speckit.fx2dotnet-planner.generate-plan"
+    - "speckit.fx2dotnet-build-fix.diagnose-build"
+    - "speckit.fx2dotnet-build-fix.apply-fix-pattern"
+    - "speckit.fx2dotnet-build-fix.retry-build"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-multitarget.add-target-frameworks"
+      file: "commands/add-target-frameworks.md"
+      description: "Update a project from TargetFramework to TargetFrameworks and add requested modern TFMs"
+
+    - name: "speckit.fx2dotnet-multitarget.validate-api-gaps"
+      file: "commands/validate-api-gaps.md"
+      description: "Identify and remediate API gaps introduced by the added target frameworks"
+
+    - name: "speckit.fx2dotnet-multitarget.record-multitarget-state"
+      file: "commands/record-multitarget-state.md"
+      description: "Record multitarget phase status and API-gap resolution in per-project state"
+
+  config:
+    - name: "fx2dotnet-multitarget-config.yml"
+      template: "fx2dotnet-multitarget-config.template.yml"
+      description: "Multitarget configuration (requested TFMs, continuation behavior)"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "modernization"
+  - "multitarget"
+  - "target-frameworks"
+
+defaults:
+  multitarget:
+    requested_target_frameworks:
+      - "net10.0"
+    always_continue: false
+    require_plan_subagent: true

@@ -1,0 +1,58 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-sdk-conversion"
+  name: "fx2dotnet SDK Conversion"
+  version: "1.0.0"
+  description: "Phase 3 — Convert legacy .NET Framework project files to SDK-style format using the App Modernization MCP tool, then validate with a build-fix pass."
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-sdk-conversion"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+  tools:
+    - name: "Microsoft.GitHubCopilot.AppModernization.Mcp"
+      version: ">=1.0.0"
+      required: true
+    - name: "Swick.Mcp.Fx2dotnet"
+      version: ">=0.1.0"
+      required: false
+  commands:
+    - "speckit.fx2dotnet-support-core.resolve-solution-context"
+    - "speckit.fx2dotnet-build-fix.diagnose-build"
+    - "speckit.fx2dotnet-build-fix.apply-fix-pattern"
+    - "speckit.fx2dotnet-build-fix.retry-build"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-sdk-conversion.convert-project"
+      file: "commands/convert-project.md"
+      description: "Convert a legacy project to SDK-style format via the App Modernization MCP tool"
+
+    - name: "speckit.fx2dotnet-sdk-conversion.validate-conversion"
+      file: "commands/validate-conversion.md"
+      description: "Validate that conversion succeeded by running a build-fix pass"
+
+    - name: "speckit.fx2dotnet-sdk-conversion.normalize-project-file"
+      file: "commands/normalize-project-file.md"
+      description: "Apply post-conversion normalization (remove redundant elements, verify TFM)"
+
+  config:
+    - name: "fx2dotnet-sdk-conversion-config.yml"
+      template: "fx2dotnet-sdk-conversion-config.template.yml"
+      description: "SDK conversion configuration"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "modernization"
+  - "sdk-conversion"
+  - "project-format"
+
+defaults:
+  conversion:
+    stop_on_per_project_failure: true
+    require_build_validation: true

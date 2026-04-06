@@ -1,0 +1,19 @@
+# fx2dotnet Package Compatibility Configuration
+# Created automatically on extension installation. Edit to customize package-update execution behavior.
+
+package_compat:
+  # Continue automatically to the next chunk after a successful chunk
+  always_continue: false
+
+  # Require user approval before applying replace-with substitutions
+  stop_on_risky_substitution: true
+
+  # Prefer updates in Directory.Packages.props when central package management is used
+  prefer_central_package_management: true
+
+logging:
+  level: info
+
+# Environment Variable Overrides:
+# SPECKIT_FX2DOTNET_PACKAGE_COMPAT_PACKAGE_COMPAT_ALWAYS_CONTINUE
+# SPECKIT_FX2DOTNET_PACKAGE_COMPAT_PACKAGE_COMPAT_STOP_ON_RISKY_SUBSTITUTION

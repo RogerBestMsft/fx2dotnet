@@ -1,0 +1,10 @@
+# fx2dotnet Orchestrator Configuration
+# Created automatically on extension installation. Edit to customize workflow behavior.
+
+orchestrator:
+  target_framework: net10.0
+  resume_behavior: ask          # ask | resume | start-fresh
+  enforce_phase_gates: true
+
+logging:
+  level: info

@@ -1,0 +1,47 @@
+# fx2dotnet Assessment Configuration
+# Created automatically on extension installation. Edit to customize assessment behavior.
+
+# Logging configuration
+logging:
+  level: info                           # Options: debug, info, warning, error
+  output: console                       # Options: console, file, none
+  file_path: .fx2dotnet/assessment.log  # Used when output: file
+
+# Project discovery settings
+discovery:
+  # How far to look for projects
+  # - shallow: only projects referenced in .sln/.slnx
+  # - limited: also check parent/sibling directories
+  # - unlimited: comprehensive scan
+  scan_depth: unlimited
+
+  # Include test projects in analysis?
+  include_test_projects: false
+
+  # Frameworks to look for (empty = all)
+  frameworks_to_detect: []
+
+# Assessment output options
+output:
+  # Include dependency graph in analysis.md?
+  include_dependency_graph: true
+
+  # Include package compatibility details?
+  include_package_analysis: true
+
+# Advanced settings
+advanced:
+  # MCP tool invocation timeout in seconds
+  mcp_timeout: 30
+
+  # Process projects in parallel?
+  parallel_processing: false
+
+  # Cache project metadata between runs?
+  use_cache: true
+  cache_duration_hours: 24
+
+# Environment Variable Overrides:
+# SPECKIT_FX2DOTNET_ASSESSMENT_LOGGING_LEVEL
+# SPECKIT_FX2DOTNET_ASSESSMENT_DISCOVERY_SCAN_DEPTH
+# SPECKIT_FX2DOTNET_ASSESSMENT_ADVANCED_MCP_TIMEOUT

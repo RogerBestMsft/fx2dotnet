@@ -1,0 +1,22 @@
+# fx2dotnet Build Fix Configuration
+# Created automatically on extension installation. Edit to customize build-fix behavior.
+
+# Build fix loop settings
+build_fix:
+  # Maximum number of fix attempts per error group before escalating to user
+  max_retries_per_group: 3
+
+  # Throughput mode: continue automatically between groups without asking
+  # Set to false to checkpoint after each group
+  throughput_mode: true
+
+  # Always ask before adding any new NuGet package dependency
+  ask_before_new_packages: true
+
+# Logging
+logging:
+  level: info
+
+# Environment Variable Overrides:
+# SPECKIT_FX2DOTNET_BUILD_FIX_BUILD_FIX_MAX_RETRIES_PER_GROUP
+# SPECKIT_FX2DOTNET_BUILD_FIX_BUILD_FIX_THROUGHPUT_MODE

@@ -1,0 +1,11 @@
+# fx2dotnet Multitarget Configuration
+# Created automatically on extension installation. Edit to customize multitarget behavior.
+
+multitarget:
+  requested_target_frameworks:
+    - net10.0
+  always_continue: false
+  require_plan_subagent: true
+
+logging:
+  level: info

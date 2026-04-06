@@ -1,0 +1,41 @@
+schema_version: "1.0"
+
+extension:
+  id: "fx2dotnet-web-route-inventory"
+  name: "fx2dotnet Web Route Inventory"
+  version: "1.0.0"
+  description: "Support extension — Extract route, handler, module, ASMX, and thin ASPX endpoint inventory from a legacy ASP.NET web host project."
+  author: "RogerBestMSFT"
+  repository: "https://github.com/RogerBestMSFT/fx2dotnet"
+  license: "MIT"
+  homepage: "https://github.com/RogerBestMSFT/fx2dotnet/tree/main/fx2dotnet-web-route-inventory"
+
+requires:
+  speckit_version: ">=0.2.0,<2.0.0"
+
+provides:
+  commands:
+    - name: "speckit.fx2dotnet-web-route-inventory.inventory-routes"
+      file: "commands/inventory-routes.md"
+      description: "Extract controller and convention routes from a legacy ASP.NET web host"
+
+    - name: "speckit.fx2dotnet-web-route-inventory.inventory-handlers"
+      file: "commands/inventory-handlers.md"
+      description: "Inventory HTTP handlers and ASMX endpoints from a legacy ASP.NET web host"
+
+    - name: "speckit.fx2dotnet-web-route-inventory.inventory-modules"
+      file: "commands/inventory-modules.md"
+      description: "Inventory HTTP modules and request pipeline behaviors from a legacy ASP.NET web host"
+
+  config:
+    - name: "fx2dotnet-web-route-inventory-config.yml"
+      template: "fx2dotnet-web-route-inventory-config.template.yml"
+      description: "Web route inventory configuration"
+      required: false
+
+tags:
+  - "dotnet"
+  - "migration"
+  - "web"
+  - "routes"
+  - "inventory"

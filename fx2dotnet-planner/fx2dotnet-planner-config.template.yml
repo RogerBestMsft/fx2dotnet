@@ -1,0 +1,26 @@
+# fx2dotnet Planner Configuration
+# Created automatically on extension installation. Edit to customize planning behavior.
+
+# Planning behavior
+planning:
+  # Maximum number of packages to include in one update chunk
+  max_packages_per_chunk: 5
+
+  # Stop and require user approval if blocking packages are found
+  stop_on_blocking_packages: true
+
+  # Require user approval for each unsupported library resolution
+  require_user_approval_for_unsupported: true
+
+# Risk thresholds
+risk:
+  # Minimum risk level that triggers a separate chunk (low, medium, high, blocking)
+  isolate_from_level: high
+
+# Logging
+logging:
+  level: info
+
+# Environment Variable Overrides:
+# SPECKIT_FX2DOTNET_PLANNER_PLANNING_MAX_PACKAGES_PER_CHUNK
+# SPECKIT_FX2DOTNET_PLANNER_PLANNING_STOP_ON_BLOCKING_PACKAGES
