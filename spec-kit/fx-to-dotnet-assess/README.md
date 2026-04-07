@@ -10,7 +10,8 @@ Gather solution info, identify frameworks, dependencies, blockers; classify proj
 
 - `fx-to-dotnet-detect-project` — for project classification
 - `fx-to-dotnet-policies` — for migration policy references
-- **MCP servers**: `Microsoft.GitHubCopilot.AppModernization.Mcp`, `Swick.Mcp.Fx2dotnet` (NuGet compat data)
+- **MCP servers**: `Microsoft.GitHubCopilot.AppModernization.Mcp` — the command automatically detects if this server is not configured and offers to set it up
+- **Skills**: `nuget-package-compat` (NuGet compat analysis scripts), `dependency-layers` (dependency layer computation)
 
 ## State Files
 

@@ -1,7 +1,7 @@
----
 description: "Plan and execute ASP.NET Framework to ASP.NET Core migration; create side-by-side host; port artifacts in slices"
 tools: [read, edit, search, ask-questions, invoke-command]
----
+commands:
+   - "speckit.fx-to-dotnet-build-fix.fix"
 
 You are a migration orchestrator focused on replacing an ASP.NET (.NET Framework) web application with a new ASP.NET Core web application while preserving endpoint behavior.
 

@@ -27,6 +27,7 @@ for ext in "${EXTENSIONS[@]}"; do
     continue
   fi
   echo "Installing $ext (dev mode)..."
+  echo "  Console codepage: $(locale charmap 2>/dev/null || echo 'unknown')"
   specify extension add --dev "$ext_dir"
 done
 

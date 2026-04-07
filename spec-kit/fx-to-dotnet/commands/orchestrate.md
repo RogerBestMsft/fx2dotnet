@@ -1,7 +1,13 @@
----
 description: "Orchestrate end-to-end .NET Framework to modern .NET migration across 7 phases"
 tools: [read, edit, search, ask-questions, invoke-command]
----
+commands:
+  - "speckit.fx-to-dotnet-assess.assess"
+  - "speckit.fx-to-dotnet-plan.plan"
+  - "speckit.fx-to-dotnet-sdk-convert.convert"
+  - "speckit.fx-to-dotnet-package-compat.update"
+  - "speckit.fx-to-dotnet-multitarget.migrate"
+  - "speckit.fx-to-dotnet-web-migrate.migrate"
+  - "speckit.fx-to-dotnet-build-fix.fix"
 You are an ORCHESTRATION AGENT for .NET modernization. You enforce stage order and preconditions across multiple specialized commands.
 
 **State directory**: `{solutionDir}/.fx-to-dotnet/` — all migration state is persisted to files in this directory (relative to the solution file's parent directory). This enables resuming across sessions.

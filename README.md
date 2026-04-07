@@ -222,7 +222,7 @@ flowchart TD
 
 ## Dependency Layers
 
-Phases 3 and 5 (SDK conversion and multitargeting) process projects **layer by layer**. During assessment, the `ComputeDependencyLayers` tool groups the topological project list into dependency layers:
+Phases 3 and 5 (SDK conversion and multitargeting) process projects **layer by layer**. During assessment, the `dependency-layers` skill guides the agent to compute dependency layers from the topological project list:
 
 - **Layer 1** — leaf projects with no in-solution dependencies.
 - **Layer 2** — projects that depend only on Layer 1 projects.
@@ -286,4 +286,7 @@ Skills encode migration best practices that override default agent behavior in s
 ### MCP Tool Servers
 
 - **Microsoft.GitHubCopilot.AppModernization.MCP** — Project analysis, SDK-style conversion, build tooling.
-- **Swick.Mcp.Fx2dotnet** — Discovers minimum NuGet package versions needed for a target framework, resolves feeds, and reports legacy packaging patterns.
+
+### Subagents
+
+- **NuGet Analysis** — Runs NuGet v3 REST API scripts (from the `nuget-package-compat` skill) to discover minimum compatible package versions and prune transitive dependencies.

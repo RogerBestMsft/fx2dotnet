@@ -26,7 +26,7 @@ You are a read-only planning agent. Your job is to consume the assessment findin
 You receive from the calling agent:
 - `assessmentContent` — the full text of the assessment report (passed inline, not as a file path)
 - `topologicalProjects` — ordered list of project paths (dependency order)
-- `dependencyLayers` — projects grouped by dependency layer (from `ComputeDependencyLayers`). Layer 1 = leaf projects with no in-solution dependencies; each subsequent layer depends only on earlier layers. Projects within the same layer are independent and can be processed in parallel.
+- `dependencyLayers` — projects grouped by dependency layer (from the assessment report's Dependency Layers section, computed via the `dependency-layers` skill). Layer 1 = leaf projects with no in-solution dependencies; each subsequent layer depends only on earlier layers. Projects within the same layer are independent and can be processed in parallel.
 - `solutionPath` — path to the .sln/.slnx file
 - `targetFramework` — target framework (default: net10.0)
 

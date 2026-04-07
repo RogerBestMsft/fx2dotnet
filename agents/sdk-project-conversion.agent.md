@@ -3,8 +3,8 @@ name: SDK-Style Project Conversion
 description: "Convert a legacy project file to SDK-style format using the convert_project_to_sdk_style tool, then invoke Build Fix to resolve any compilation errors until the project builds successfully."
 argument-hint: "Specify the .sln, .csproj, .vbproj, or .fsproj file to convert to SDK-style format"
 target: vscode
-tools: [vscode/askQuestions, read, agent, microsoft.githubcopilot.appmodernization.mcp/convert_project_to_sdk_style, Swick.Mcp.Fx2dotnet/GetMinimalPackageSet, edit, search, todo]
-agents: ['Build Fix']
+tools: [vscode/askQuestions, read, agent, microsoft.githubcopilot.appmodernization.mcp/convert_project_to_sdk_style, edit, search, todo]
+agents: ['Build Fix', 'NuGet Analysis']
 handoffs:
   - label: Commit Changes
     agent: agent
@@ -119,11 +119,11 @@ Before delegating, update the `## SDK Conversion` section via the `edit` tool:
 
 ## 6. Prune Redundant Package References
 
-After the initial build-fix pass succeeds, use the `GetMinimalPackageSet` tool to determine which `<PackageReference>` entries are redundant. SDK-style projects resolve transitive dependencies automatically, so references that are already pulled in by another direct reference can be safely removed.
+After the initial build-fix pass succeeds, delegate to the **NuGet Analysis** subagent with a `getMinimalPackageSet` operation to determine which `<PackageReference>` entries are redundant. SDK-style projects resolve transitive dependencies automatically, so references that are already pulled in by another direct reference can be safely removed.
 
 1. Read the converted project file's `<PackageReference>` items (package ID + version)
-2. Call `GetMinimalPackageSet` with the full list and the workspace/NuGet config context
-3. The tool returns `Keep` (packages that must remain) and `Removed` (packages that are transitively provided, with the parent that provides them)
+2. Delegate to the **NuGet Analysis** subagent, passing the full list of packages and the workspace/NuGet config context as JSON input (matching the schema in the `nuget-package-compat` skill)
+3. The subagent returns `keep` (packages that must remain) and `removed` (packages that are transitively provided, with the parent that provides them)
 4. If `Removed` is empty, skip to step 7
 5. For each package in `Removed`, remove the `<PackageReference>` from the project file using the `edit` tool
 6. If using Central Package Management (`Directory.Packages.props`), also check whether the corresponding `<PackageVersion>` entry is still needed by other projects before removing it

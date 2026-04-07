@@ -192,7 +192,7 @@ provides:
 
 #### 4. `spec-kit/fx-to-dotnet-assess/extension.yml` — Assessment
    - `id: fx-to-dotnet-assess`
-   - `requires.tools`: `Microsoft.GitHubCopilot.AppModernization.Mcp`, NuGet compat MCP server
+   - `requires.tools`: `Microsoft.GitHubCopilot.AppModernization.Mcp`
    - `provides.commands`: `speckit.fx-to-dotnet-assess.assess`
 
 #### 5. `spec-kit/fx-to-dotnet-plan/extension.yml` — Migration Planner
@@ -202,7 +202,7 @@ provides:
 
 #### 6. `spec-kit/fx-to-dotnet-sdk-convert/extension.yml` — SDK Conversion
    - `id: fx-to-dotnet-sdk-convert`
-   - `requires.tools`: `Microsoft.GitHubCopilot.AppModernization.Mcp`, NuGet compat MCP server
+   - `requires.tools`: `Microsoft.GitHubCopilot.AppModernization.Mcp`
    - `provides.commands`: `speckit.fx-to-dotnet-sdk-convert.convert`
 
 #### 7. `spec-kit/fx-to-dotnet-build-fix/extension.yml` — Build Fix
@@ -310,7 +310,7 @@ Each command is created by: (a) copying the markdown body from the corresponding
 #### 15. `spec-kit/fx-to-dotnet-assess/commands/assess.md` — *Phase 1: Assessment*
    - **Source**: `agents/assessment.agent.md`
    - **description**: "Gather solution info, identify frameworks, dependencies, blockers; classify projects; audit package compatibility"
-   - **tools**: MCP tools (`get_state`, `get_scenarios`, `get_instructions`, `start_task`, `complete_task`, `get_projects_in_topological_order`, `FindRecommendedPackageUpgrades`, `ComputeDependencyLayers`), file read/write, search, invoke-command
+   - **tools**: MCP tools (`get_state`, `get_scenarios`, `get_instructions`, `start_task`, `complete_task`, `get_projects_in_topological_order`), `dependency-layers` skill (inline computation), `nuget-package-compat` skill scripts (`findRecommendedUpgrades`), file read/write, search, invoke-command
    - **Body** (copied from source, then adapted): Instructions for:
      - Resume check for existing `.fx-to-dotnet/analysis.md`
      - MCP initialization sequence
@@ -333,12 +333,12 @@ Each command is created by: (a) copying the markdown body from the corresponding
 #### 17. `spec-kit/fx-to-dotnet-sdk-convert/commands/convert.md` — *Phase 3: SDK Conversion*
    - **Source**: `agents/sdk-project-conversion.agent.md`
    - **description**: "Convert legacy .NET Framework project file to SDK-style format; validate with build-fix"
-   - **tools**: MCP tools (`convert_project_to_sdk_style`, `GetMinimalPackageSet`), file read/write, search, ask-questions, invoke-command
+   - **tools**: MCP tools (`convert_project_to_sdk_style`), `nuget-package-compat` skill scripts (`getMinimalPackageSet`), file read/write, search, ask-questions, invoke-command
    - **Body** (copied from source, then adapted): Instructions for:
      - Initialize, resume check, invoke MCP conversion tool
      - Verify `<Project Sdk=...>` in output
      - Delegate to `speckit.fx-to-dotnet-build-fix.fix`; let it run full loop
-     - Prune redundant PackageReferences via `GetMinimalPackageSet`; re-run build-fix
+     - Prune redundant PackageReferences via `nuget-package-compat` skill scripts (`getMinimalPackageSet`); re-run build-fix
      - State: conversionStatus, buildStatus
 
 #### 18. `spec-kit/fx-to-dotnet-build-fix/commands/fix.md` — *Cross-cutting: Build/Fix Loop*
@@ -528,7 +528,7 @@ Each policy doc is created by copying the corresponding fx2dotnet skill SKILL.md
 | **Monorepo layout** | All 11 extensions live in one repo for coordinated development, but each directory is independently installable |
 | **Shared policies extension** | `fx-to-dotnet-policies` carries all 4 policy docs with a `show` utility command; avoids duplicating policies across extensions |
 | **Build scripts in build-fix extension** | Scripts are only used by the build-fix command, so they live in that extension |
-| **No built-in MCP server** | External MCP servers required; only `fx-to-dotnet-assess` and `fx-to-dotnet-sdk-convert` declare MCP tool dependencies |
+| **No built-in MCP server** | Only `Microsoft.GitHubCopilot.AppModernization.Mcp` is an external MCP dependency; NuGet compat analysis uses bundled skill scripts instead of an MCP server |
 | **Cross-extension command naming** | `speckit.{ext-id}.{verb}` — each extension exposes one command with a short verb (`fix`, `assess`, `plan`, `convert`, `update`, `migrate`, `detect`, `inventory`, `show`) |
 | **Shared state directory `.fx-to-dotnet/`** | All extensions read/write the same state files under the solution directory; state format is consistent across extensions |
 | **Copy-and-adapt from fx2dotnet** | Markdown bodies copied from existing agent/skill files then adapted per checklist |
@@ -541,4 +541,4 @@ Each policy doc is created by copying the corresponding fx2dotnet skill SKILL.md
 2. **Version coordination**: All extensions should share the same version number and be released together to avoid compatibility drift between sibling extensions.
 3. **Preset layering**: Teams wanting to customize policies could install a Spec Kit preset that overrides specific policy docs in `fx-to-dotnet-policies`. Out of scope for v0.1.0.
 4. **Partial adoption**: Document in the root README which extensions can be used standalone (e.g., `fx-to-dotnet-build-fix` is useful for any .NET project, not just migrations) vs. which require the full suite.
-5. **MCP config template**: Include a sample `.mcp.json` in the root README showing the expected MCP server configuration.
+5. **MCP config template**: Include a sample `.mcp.json` in the root README showing the expected `Microsoft.GitHubCopilot.AppModernization.Mcp` server configuration.

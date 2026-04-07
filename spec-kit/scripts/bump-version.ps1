@@ -1,13 +1,16 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-  Bump the version in all spec-kit extension.yml files.
+  Bump the extension version in all spec-kit extension.yml files.
+  Only the extension:version field is updated; schema_version and
+  requires:speckit_version are left unchanged.
 .EXAMPLE
-  scripts/bump-version.ps1 -Version 0.2.0
+  scripts/bump-version.ps1 -Version 0.1.2
 #>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)]
+    [ValidatePattern('^\d+\.\d+\.\d+$')]
     [string]$Version
 )
 
@@ -36,7 +39,8 @@ foreach ($ext in $Extensions) {
         continue
     }
     $content = Get-Content $yml -Raw
-    $content = $content -replace 'version:\s*"?[^"\s]+"?', "version: `"$Version`""
+    # Bump extension version (indented "version:" under extension:)
+    $content = $content -replace '(?m)(^\s+version:\s*)"?[^"\s]+"?', "`${1}`"$Version`""
     Set-Content -Path $yml -Value $content -NoNewline
     Write-Host "  $ext -> $Version"
 }

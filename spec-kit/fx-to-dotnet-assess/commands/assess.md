@@ -1,7 +1,7 @@
----
 description: "Gather solution info, identify frameworks, dependencies, blockers; classify projects; audit package compatibility"
-tools: [microsoft.githubcopilot.appmodernization.mcp/*, Swick.Mcp.Fx2dotnet/*, read, search, edit, ask-questions, invoke-command]
----
+tools: [microsoft.githubcopilot.appmodernization.mcp/*, read, search, edit, ask-questions, invoke-command]
+commands:
+   - "speckit.fx-to-dotnet-detect-project.detect"
 
 # Assessment Command
 
@@ -37,6 +37,21 @@ You are a .NET migration assessment specialist. Your job is to gather informatio
 ## Workflow
 
 ### 1. Initialize
+
+#### MCP Server Pre-flight
+
+Before any MCP tool calls, verify the workspace has the required MCP server configured:
+
+1. Use the `read` tool to read `.mcp.json` from the workspace root (same directory as the solution file, or its parent)
+2. If the read fails (file does not exist) or the JSON does not contain a `Microsoft.GitHubCopilot.AppModernization.Mcp` key under `mcpServers`:
+   - Reference `fx-to-dotnet-policies/policies/mcp-setup.md` for the canonical configuration
+   - Ask the user:
+     - **"Configure automatically"** — create or patch `.mcp.json`
+     - **"I'll configure it manually"** — show the required snippet and stop
+   - If auto-configuring, use the `edit` tool to create or merge the entry into `.mcp.json`
+   - Tell the user to reload the VS Code window (`Ctrl+Shift+P` → `Developer: Reload Window`), then retry this command
+   - **Stop** — do not proceed until the MCP server is available
+3. If the entry is present, continue to Resume Check
 
 #### Resume Check
 
@@ -95,11 +110,12 @@ If no projects are returned or the tool errors, report the error.
 
 After obtaining the topological project order, call `get_project_dependencies` for all projects in parallel (passing the solution path and each project path) to collect their project references. From the returned dependencies, extract the project-type dependencies to build a dependency map.
 
-Call `ComputeDependencyLayers` with the gathered project-dependency data:
-- Each entry: `{ projectPath: "<workspace-relative path>", dependencies: ["<dep1>", "<dep2>", ...] }`
+Follow the `dependency-layers` skill to compute dependency layers from the gathered project-dependency data:
+- Build the input list where each entry has: `projectPath` (workspace-relative path) and `dependencies` (list of in-solution project references)
 - Dependencies should only include projects that are in the topological project list (in-solution references)
+- Execute the algorithm described in the skill: normalize paths → build adjacency map → iterative reduction → cycle detection
 
-Record the returned layers. If the tool returns `UnresolvedCycles`, include them in the assessment report as a warning.
+Record the computed layers. If any projects remain as unresolved cycles, include them in the assessment report as a warning.
 
 Include both `topologicalProjects` and `dependencyLayers` in `.fx-to-dotnet/analysis.md`.
 
@@ -145,7 +161,7 @@ Classify project scope:
 
 For each candidate package, collect real compatibility data. The assessment does NOT make update decisions or group packages — it only gathers facts for the Migration Planner.
 
-1. Call the `FindRecommendedPackageUpgrades` MCP tool with the effective feed context
+1. Invoke the NuGet package compatibility analysis scripts (from the `nuget-package-compat` skill) with a `findRecommendedUpgrades` operation, passing the effective feed context and the list of candidate packages as JSON input
 2. For each package, record:
    - Whether the current version already supports the target framework
    - If not, the **minimum version** that supports both .NET Framework and .NET Core/Standard/modern .NET

@@ -347,18 +347,17 @@ done
 
 ## MCP Server Dependencies
 
-The extensions themselves are markdown-only, but two extensions (`fx-to-dotnet-assess` and `fx-to-dotnet-sdk-convert`) require external MCP servers. These are NOT distributed as part of the extension family — they are separate tools the user must configure.
+The extensions themselves are markdown-only, but two extensions (`fx-to-dotnet-assess` and `fx-to-dotnet-sdk-convert`) require an external MCP server. This is NOT distributed as part of the extension family — it is a separate tool the user must configure. NuGet package compatibility analysis is handled by bundled skill scripts (`nuget-package-compat`) and does not require an MCP server.
 
 ### Required MCP Servers
 
 | MCP Server | Used by | Distribution |
 |---|---|---|
 | `Microsoft.GitHubCopilot.AppModernization.Mcp` | assess, sdk-convert | NuGet tool package (`dnx` runner) |
-| `Swick.Mcp.Fx2dotnet` | assess, sdk-convert | NuGet tool package (`dnx` runner) |
 
 ### User Setup
 
-Users must configure `.mcp.json` in their project or workspace with the MCP server entries. The root README and relevant extension READMEs include the required `.mcp.json` configuration:
+Users must configure `.mcp.json` in their project or workspace with the MCP server entry. The root README and relevant extension READMEs include the required `.mcp.json` configuration:
 
 ```json
 {
@@ -368,18 +367,12 @@ Users must configure `.mcp.json` in their project or workspace with the MCP serv
       "command": "dnx",
       "args": ["Microsoft.GitHubCopilot.AppModernization.Mcp@1.0.903-preview1", "--yes"],
       "tools": ["*"]
-    },
-    "Swick.Mcp.Fx2dotnet": {
-      "type": "stdio",
-      "command": "dnx",
-      "args": ["Swick.Mcp.Fx2dotnet@0.1.0-beta", "--yes"],
-      "tools": ["*"]
     }
   }
 }
 ```
 
-The `extension.yml` for `fx-to-dotnet-assess` and `fx-to-dotnet-sdk-convert` declare these as `requires.tools` — Spec Kit will warn the user if the tools are not available.
+The `extension.yml` for `fx-to-dotnet-assess` and `fx-to-dotnet-sdk-convert` declare `Microsoft.GitHubCopilot.AppModernization.Mcp` as a `requires.tools` entry — Spec Kit will warn the user if the tool is not available.
 
 ---
 
@@ -408,7 +401,7 @@ The `extension.yml` for `fx-to-dotnet-assess` and `fx-to-dotnet-sdk-convert` dec
 | **Community catalog for discovery** | Standard Spec Kit distribution path; users find extensions via `specify extension search` |
 | **Atomic versioning** | All 11 extensions share one version; prevents cross-extension compatibility drift |
 | **Tag-triggered release** | Pushing a `v*` tag triggers packaging + publishing; no manual artifact creation |
-| **MCP servers not bundled** | MCP servers are separate NuGet tool packages with their own release cadence; extensions declare them as `requires.tools` |
+| **MCP server not bundled** | `Microsoft.GitHubCopilot.AppModernization.Mcp` is a separate NuGet tool package with its own release cadence; NuGet compat analysis uses bundled skill scripts |
 | **No auto-update hook** | Users explicitly update; avoids breaking in-progress migrations |
 
 ---

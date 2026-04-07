@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Bump the version in all spec-kit extension.yml files
-# Usage: scripts/bump-version.sh 0.2.0
+# Bump the extension version in all spec-kit extension.yml files.
+# Only the extension:version field is updated; schema_version and
+# requires:speckit_version are left unchanged.
+# Usage: scripts/bump-version.sh 0.1.2
 
 if [ $# -ne 1 ]; then
-  echo "Usage: $0 <new-version>" >&2
+  echo "Usage: $0 <major.minor.patch>" >&2
   exit 1
 fi
 
 VERSION="$1"
+if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+  echo "Error: Version must be major.minor.patch format, got: $VERSION" >&2
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SPEC_KIT="$SCRIPT_DIR/.."
 
@@ -33,7 +40,8 @@ for ext in "${EXTENSIONS[@]}"; do
     echo "WARNING: $yml not found" >&2
     continue
   fi
-  sed -i "s/version: .*/version: \"$VERSION\"/" "$yml"
+  # Bump extension version (indented "version:" under extension:)
+  sed -i "s/^\([[:space:]]\+\)version: .*/\1version: \"$VERSION\"/" "$yml"
   echo "  $ext -> $VERSION"
 done
 

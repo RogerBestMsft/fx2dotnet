@@ -1,8 +1,8 @@
 ---
 name: "Assessment of .NET Solution for Migration"
 description: "Gathers information about a .NET solution for migration to .NET 10. Identifies frameworks, dependencies, routes, and blockers. Classifies each project (SDK-style vs legacy, web host vs library). Resolves NuGet feeds, audits package compatibility, and produces compatibility cards. Returns the assessment report path, topological project order, project classifications, and package compatibility findings."
-tools: [microsoft.githubcopilot.appmodernization.mcp/*, Swick.Mcp.Fx2dotnet/*, read, search, agent, edit, vscode/askQuestions]
-agents: ['Explore', 'Project Type Detector']
+tools: [microsoft.githubcopilot.appmodernization.mcp/*, read, search, agent, edit, vscode/askQuestions]
+agents: ['Explore', 'Project Type Detector', 'NuGet Analysis']
 argument-hint: "Required: Solution path of a .NET Project"
 ---
 
@@ -98,11 +98,12 @@ If no projects are returned or the tool errors, report the error.
 
 After obtaining the topological project order, call `get_project_dependencies` for all projects in parallel (passing the solution path and each project path) to collect their project references. From the returned dependencies, extract the project-type dependencies to build a dependency map.
 
-Call `ComputeDependencyLayers` with the gathered project-dependency data:
-- Each entry: `{ projectPath: "<workspace-relative path>", dependencies: ["<dep1>", "<dep2>", ...] }`
+Follow the `dependency-layers` skill to compute dependency layers from the gathered project-dependency data:
+- Build the input list where each entry has: `projectPath` (workspace-relative path) and `dependencies` (list of in-solution project references)
 - Dependencies should only include projects that are in the topological project list (in-solution references)
+- Execute the algorithm described in the skill: normalize paths → build adjacency map → iterative reduction → cycle detection
 
-Record the returned layers. If the tool returns `UnresolvedCycles`, include them in the assessment report as a warning.
+Record the computed layers. If any projects remain as unresolved cycles, include them in the assessment report as a warning.
 
 Include both `topologicalProjects` and `dependencyLayers` in `.fx2dotnet/analysis.md`.
 
@@ -148,7 +149,7 @@ Classify project scope:
 
 For each candidate package, collect real compatibility data. The assessment does NOT make update decisions or group packages — it only gathers facts for the Migration Planner.
 
-1. Call the `FindRecommendedPackageUpgrades` MCP tool with the effective feed context
+1. Delegate to the **NuGet Analysis** subagent with a `findRecommendedUpgrades` operation, passing the effective feed context and the list of candidate packages as JSON input (matching the schema in the `nuget-package-compat` skill)
 2. For each package, record:
    - Whether the current version already supports the target framework
    - If not, the **minimum version** that supports both .NET Framework and .NET Core/Standard/modern .NET

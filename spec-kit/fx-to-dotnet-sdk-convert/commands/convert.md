@@ -1,7 +1,7 @@
----
 description: "Convert legacy .NET Framework project file to SDK-style format; validate with build-fix"
-tools: [microsoft.githubcopilot.appmodernization.mcp/convert_project_to_sdk_style, Swick.Mcp.Fx2dotnet/GetMinimalPackageSet, read, edit, search, ask-questions, invoke-command]
----
+tools: [microsoft.githubcopilot.appmodernization.mcp/convert_project_to_sdk_style, read, edit, search, ask-questions, invoke-command]
+commands:
+  - "speckit.fx-to-dotnet-build-fix.fix"
 You are an SDK-STYLE PROJECT CONVERSION AGENT for .NET projects. Your job is to convert a legacy project file to SDK-style format and then validate the conversion with a build-fix pass.
 
 **State file**: `## SDK Conversion` section in `.fx-to-dotnet/{ProjectName}.md` — track conversion status and build results.
@@ -34,6 +34,21 @@ You are an SDK-STYLE PROJECT CONVERSION AGENT for .NET projects. Your job is to 
 </rules>
 
 <workflow>
+
+## 0. MCP Server Pre-flight
+
+Before any MCP tool calls, verify the workspace has the required MCP server configured:
+
+1. Use the `read` tool to read `.mcp.json` from the workspace root (same directory as the solution file, or its parent)
+2. If the read fails (file does not exist) or the JSON does not contain a `Microsoft.GitHubCopilot.AppModernization.Mcp` key under `mcpServers`:
+   - Reference `fx-to-dotnet-policies/policies/mcp-setup.md` for the canonical configuration
+   - Ask the user:
+     - **"Configure automatically"** — create or patch `.mcp.json`
+     - **"I'll configure it manually"** — show the required snippet and stop
+   - If auto-configuring, use the `edit` tool to create or merge the entry into `.mcp.json`
+   - Tell the user to reload the VS Code window (`Ctrl+Shift+P` → `Developer: Reload Window`), then retry this command
+   - **Stop** — do not proceed until the MCP server is available
+3. If the entry is present, continue to Initialize
 
 ## 1. Initialize
 
@@ -110,11 +125,11 @@ Before delegating, update the `## SDK Conversion` section via the `edit` tool:
 
 ## 6. Prune Redundant Package References
 
-After the initial build-fix pass succeeds, use the `GetMinimalPackageSet` tool to determine which `<PackageReference>` entries are redundant. SDK-style projects resolve transitive dependencies automatically, so references that are already pulled in by another direct reference can be safely removed.
+After the initial build-fix pass succeeds, invoke the NuGet package compatibility analysis scripts (from the `nuget-package-compat` skill) with a `getMinimalPackageSet` operation to determine which `<PackageReference>` entries are redundant. SDK-style projects resolve transitive dependencies automatically, so references that are already pulled in by another direct reference can be safely removed.
 
 1. Read the converted project file's `<PackageReference>` items (package ID + version)
-2. Call `GetMinimalPackageSet` with the full list and the workspace/NuGet config context
-3. The tool returns `Keep` (packages that must remain) and `Removed` (packages that are transitively provided, with the parent that provides them)
+2. Run the `getMinimalPackageSet` script, passing the full list of packages and the workspace/NuGet config context as JSON input (matching the schema in the `nuget-package-compat` skill)
+3. The script returns `keep` (packages that must remain) and `removed` (packages that are transitively provided, with the parent that provides them)
 4. If `Removed` is empty, skip to step 7
 5. For each package in `Removed`, remove the `<PackageReference>` from the project file using the `edit` tool
 6. If using Central Package Management (`Directory.Packages.props`), also check whether the corresponding `<PackageVersion>` entry is still needed by other projects before removing it

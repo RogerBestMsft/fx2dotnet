@@ -83,7 +83,9 @@ done
 - **.NET SDK** (for `dotnet build` via the build-fix extension)
 - **MCP Servers** (required by assessment and SDK conversion extensions):
   - `Microsoft.GitHubCopilot.AppModernization.Mcp` — project analysis and SDK conversion
-  - `Swick.Mcp.Fx2dotnet` — NuGet package compatibility data
+- **Skills** (bundled in the repo, used by assessment and SDK conversion):
+  - `dependency-layers` — dependency layer computation algorithm
+  - `nuget-package-compat` — NuGet package compatibility analysis scripts
 
 ### Sample MCP Configuration (`.mcp.json`)
 
@@ -94,11 +96,6 @@ done
       "type": "stdio",
       "command": "dotnet",
       "args": ["run", "--project", "<path-to-appmod-mcp-server>"]
-    },
-    "Swick.Mcp.Fx2dotnet": {
-      "type": "stdio",
-      "command": "dotnet",
-      "args": ["run", "--project", "<path-to-fx2dotnet-mcp-server>"]
     }
   }
 }
