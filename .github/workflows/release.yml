@@ -1,6 +1,8 @@
 name: Release Spec Kit Extensions
 
 on:
+  push:
+    branches: [spec-kit-ext-general]
   workflow_dispatch:
 
 jobs:
