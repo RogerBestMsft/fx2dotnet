@@ -3,12 +3,8 @@ name: Release Spec Kit Extensions
 on:
   workflow_dispatch:
 
-# Only allow runs on the spec-kit-ext-general branch
-# (workflow_dispatch respects the branch the workflow file lives on)
-
 jobs:
   release:
-    if: github.ref == 'refs/heads/spec-kit-ext-general'
     runs-on: ubuntu-latest
     permissions:
       contents: write
