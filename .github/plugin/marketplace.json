@@ -1,6 +1,8 @@
 {
     "name": "fx2dotnet",
-    "owner": "twsouthwick",
+    "owner": {
+        "name": "twsouthwick"
+    },
     "plugins": [
         {
             "name": "fx2dotnet-modernization",
